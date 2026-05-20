@@ -122,3 +122,97 @@
 .tv-safe-zone {
   padding: 3vw;
 }
+
+/* ========================================
+   BASE STYLES
+======================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background-color: var(--color-background);
+  color: var(--color-primary-foreground);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========================================
+   FONT UTILITIES
+======================================== */
+.font-arabic {
+  font-family: var(--font-arabic);
+  direction: rtl;
+}
+
+/* ========================================
+   GLOBAL DISPLAY RESET
+======================================== */
+.display-mode {
+  cursor: none;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Hide scrollbar — Webkit */
+.display-mode ::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar — Firefox */
+.display-mode {
+  scrollbar-width: none;
+}
+
+/* ========================================
+   FOCUS STYLE — wajib untuk Android TV
+======================================== */
+:focus-visible {
+  outline: 3px solid var(--color-secondary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ========================================
+   SAFE ZONE — TV overscan protection
+======================================== */
+.tv-safe-zone {
+  padding: 3vw;
+}
+
+/* ========================================
+   TICKER FIX
+   Starts from right edge, ends past left edge.
+   --ticker-duration dikontrol dari komponen via inline style.
+======================================== */
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(100vw);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-8px);
+  }
+  40% {
+    transform: translateX(8px);
+  }
+  60% {
+    transform: translateX(-6px);
+  }
+  80% {
+    transform: translateX(6px);
+  }
+}
