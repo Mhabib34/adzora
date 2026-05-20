@@ -1,26 +1,124 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* ========================================
+     WARNA TEMA — di-override dari admin via
+     inline style di <html> tag
+  ======================================== */
+  --color-primary: #1a6b3c;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #d4a017;
+  --color-secondary-foreground: #1a1a1a;
+  --color-background: #0d1f13;
+  --color-surface: #132d1c;
+  --color-accent: #2ecc71;
+
+  /* ========================================
+     FONT FAMILY
+  ======================================== */
+  --font-display: "Inter", sans-serif;
+  --font-arabic: "Scheherazade New", serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* ========================================
+     FONT SIZE DISPLAY (minimum 2rem)
+  ======================================== */
+  --text-display-sm: 2rem;
+  --text-display-sm--line-height: 1.2;
+  --text-display-md: 3rem;
+  --text-display-md--line-height: 1.15;
+  --text-display-lg: 5rem;
+  --text-display-lg--line-height: 1.1;
+  --text-display-xl: 8rem;
+  --text-display-xl--line-height: 1.05;
+  --text-display-2xl: 12rem;
+  --text-display-2xl--line-height: 1;
+
+  /* ========================================
+     ANIMASI
+  ======================================== */
+  --animate-ticker-scroll: ticker-scroll var(--ticker-duration, 30s) linear
+    infinite;
+  --animate-fade-in: fade-in 0.5s ease-in-out;
+  --animate-fade-out: fade-out 0.5s ease-in-out;
+  --animate-slide-up: slide-up 0.4s ease-out;
+  --animate-pulse-soft: pulse-soft 2s ease-in-out infinite;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-up {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* ========================================
+   GLOBAL DISPLAY RESET
+   Untuk route /display — no cursor, no scrollbar
+======================================== */
+.display-mode {
+  cursor: none;
+  overflow: hidden;
+  user-select: none;
+}
+
+.display-mode ::-webkit-scrollbar {
+  display: none;
+}
+
+/* ========================================
+   FOCUS STYLE — wajib untuk Android TV
+======================================== */
+:focus-visible {
+  outline: 3px solid var(--color-secondary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ========================================
+   SAFE ZONE — TV overscan protection
+======================================== */
+.tv-safe-zone {
+  padding: 3vw;
 }
