@@ -88,6 +88,10 @@ export class AudioEngine {
       onloaderror: (_id, error) => {
         console.error("[AudioEngine] Failed to load audio:", error);
         this.cleanup();
+        // Fallback: biarkan overlay adzan tampil selama 5 menit tanpa suara
+        setTimeout(() => {
+          onEnd?.();
+        }, 5 * 60 * 1000);
       },
     });
 

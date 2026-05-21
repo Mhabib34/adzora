@@ -1,8 +1,3 @@
-/**
- * Zustand store for prayer calculation config and iqomah settings.
- * Persisted to localStorage via persist middleware.
- */
-
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type {
@@ -14,86 +9,62 @@ import type {
 interface PrayerState {
   calculationConfig: PrayerCalculationConfig;
   iqomahConfig: IqomahConfig;
-  // Actions
-  setCalculationConfig: (config: Partial<PrayerCalculationConfig>) => void;
+  setCalculationConfig: (c: Partial<PrayerCalculationConfig>) => void;
   setOffset: (key: PrayerKey, minutes: number) => void;
   setIqomahDuration: (
-    key: Exclude<PrayerKey, "sunrise">,
+    key: Exclude<PrayerKey, "sunrise" | "dhuha">,
     minutes: number,
   ) => void;
   resetCalculationConfig: () => void;
 }
 
-const defaultOffsets: Record<PrayerKey, number> = {
-  fajr: 0,
-  sunrise: 0,
-  dhuhr: 0,
-  asr: 0,
-  maghrib: 0,
-  isha: 0,
-};
-
-const defaultIqomahDurations: Record<Exclude<PrayerKey, "sunrise">, number> = {
-  fajr: 10,
-  dhuhr: 10,
-  asr: 10,
-  maghrib: 5,
-  isha: 10,
-};
-
-const defaultCalculationConfig: PrayerCalculationConfig = {
+const defaultCalc: PrayerCalculationConfig = {
   method: "MoonsightingCommittee",
   asrMethod: "Shafi",
-  offsets: defaultOffsets,
+  offsets: {
+    fajr: 0,
+    sunrise: 0,
+    dhuha: 0,
+    dhuhr: 0,
+    asr: 0,
+    maghrib: 0,
+    isha: 0,
+  },
+  dhuhaMinutesAfterSunrise: 20,
 };
 
-const defaultIqomahConfig: IqomahConfig = {
-  durations: defaultIqomahDurations,
+const defaultIqomah: IqomahConfig = {
+  durations: { fajr: 10, dhuhr: 10, asr: 10, maghrib: 5, isha: 10 },
 };
 
 export const usePrayerStore = create<PrayerState>()(
   persist(
     (set) => ({
-      calculationConfig: defaultCalculationConfig,
-      iqomahConfig: defaultIqomahConfig,
-
-      setCalculationConfig: (partial) =>
-        set((state) => ({
+      calculationConfig: defaultCalc,
+      iqomahConfig: defaultIqomah,
+      setCalculationConfig: (p) =>
+        set((s) => ({
+          calculationConfig: { ...s.calculationConfig, ...p },
+        })),
+      setOffset: (key, min) =>
+        set((s) => ({
           calculationConfig: {
-            ...state.calculationConfig,
-            ...partial,
+            ...s.calculationConfig,
+            offsets: { ...s.calculationConfig.offsets, [key]: min },
           },
         })),
-
-      setOffset: (key, minutes) =>
-        set((state) => ({
-          calculationConfig: {
-            ...state.calculationConfig,
-            offsets: {
-              ...state.calculationConfig.offsets,
-              [key]: minutes,
-            },
-          },
-        })),
-
-      setIqomahDuration: (key, minutes) =>
-        set((state) => ({
+      setIqomahDuration: (key, min) =>
+        set((s) => ({
           iqomahConfig: {
-            durations: {
-              ...state.iqomahConfig.durations,
-              [key]: minutes,
-            },
+            durations: { ...s.iqomahConfig.durations, [key]: min },
           },
         })),
-
       resetCalculationConfig: () =>
         set({
-          calculationConfig: defaultCalculationConfig,
-          iqomahConfig: defaultIqomahConfig,
+          calculationConfig: defaultCalc,
+          iqomahConfig: defaultIqomah,
         }),
     }),
-    {
-      name: "adzora-prayer",
-    },
+    { name: "adzora-prayer" },
   ),
 );

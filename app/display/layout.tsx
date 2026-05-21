@@ -1,26 +1,49 @@
-import type { Metadata } from "next";
-import { PinLock } from "../../components/admin/PinLock";
-import { Sidebar } from "../../components/admin/Sidebar";
+// /**
+//  * Display layout — fullscreen menggunakan 100dvh (dynamic viewport height)
+//  * agar tidak kepotong oleh browser address bar / tab bar.
+//  * cursor: none untuk tampilan TV.
+//  */
+// export default function DisplayLayout({
+//   children,
+// }: {
+//   children: React.ReactNode;
+// }) {
+//   return (
+//     <div
+//       style={{
+//         position: "fixed",
+//         top: 0,
+//         left: 0,
+//         width: "100dvw",
+//         height: "100dvh",
+//         // overflow: "hidden",
+//         // cursor: "none",
+//       }}
+//     >
+//       {children}
+//     </div>
+//   );
+// }
 
-export const metadata: Metadata = {
-  title: "Adzora Admin",
-};
 
 /**
- * Admin layout — wraps all admin pages with PIN protection and sidebar nav.
- * PinLock renders a blocking overlay until the correct PIN is entered.
+ * Display layout — fullscreen menggunakan 100dvh (dynamic viewport height)
+ * agar tidak kepotong oleh browser address bar / tab bar.
+ * cursor: none untuk tampilan TV.
  */
-export default function AdminLayout({
+export default function DisplayLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <PinLock>
-      <div className="flex min-h-screen bg-background">
-        <Sidebar />
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
-      </div>
-    </PinLock>
+    <div
+      style={{
+        width: "100%",
+        minHeight: "100dvh",
+      }}
+    >
+      {children}
+    </div>
   );
 }

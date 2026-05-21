@@ -37,8 +37,7 @@
   /* ========================================
      ANIMASI
   ======================================== */
-  --animate-ticker-scroll: ticker-scroll var(--ticker-duration, 30s) linear
-    infinite;
+  --animate-ticker-scroll: ticker-scroll var(--ticker-duration, 30s) linear infinite;
   --animate-fade-in: fade-in 0.5s ease-in-out;
   --animate-fade-out: fade-out 0.5s ease-in-out;
   --animate-slide-up: slide-up 0.4s ease-out;
@@ -49,6 +48,7 @@
   0% {
     transform: translateX(100%);
   }
+
   100% {
     transform: translateX(-100%);
   }
@@ -58,6 +58,7 @@
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
@@ -67,6 +68,7 @@
   0% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
   }
@@ -77,6 +79,7 @@
     transform: translateY(20px);
     opacity: 0;
   }
+
   100% {
     transform: translateY(0);
     opacity: 1;
@@ -84,10 +87,12 @@
 }
 
 @keyframes pulse-soft {
+
   0%,
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.6;
   }
@@ -193,25 +198,31 @@ body {
   0% {
     transform: translateX(100vw);
   }
+
   100% {
     transform: translateX(-100%);
   }
 }
 
 @keyframes shake {
+
   0%,
   100% {
     transform: translateX(0);
   }
+
   20% {
     transform: translateX(-8px);
   }
+
   40% {
     transform: translateX(8px);
   }
+
   60% {
     transform: translateX(-6px);
   }
+
   80% {
     transform: translateX(6px);
   }
