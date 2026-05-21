@@ -37,6 +37,8 @@ export const viewport: Viewport = {
  * Root layout. Applies font CSS variables and base dark background.
  * Theme colors are applied dynamically via useThemeStore.applyCSSVariables().
  */
+import { ThemeInit } from "../components/ThemeInit";
+
 export default function RootLayout({
   children,
 }: {
@@ -44,7 +46,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" className={`${inter.variable} ${scheherazade.variable}`}>
-      <body>{children}</body>
+      <body>
+        <ThemeInit />
+        {children}
+      </body>
     </html>
   );
 }

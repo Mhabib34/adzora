@@ -11,7 +11,7 @@ export const metadata: Metadata = {
  */
 export default function DisplayPage() {
   return (
-    <main className="display-mode tv-safe-zone min-h-screen w-full">
+    <main className="display-mode tv-safe-zone w-full h-screen">
       <DisplayRoot />
     </main>
   );

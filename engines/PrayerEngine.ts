@@ -9,7 +9,6 @@ import {
 } from "../db/MasjidDB";
 import {
   PRAYER_KEY_TO_NAME,
-  PRAYER_KEYS,
   type PrayerKey,
   type PrayerTime,
   type DailyPrayerSchedule,
@@ -34,7 +33,6 @@ function deserializeSchedule(
     time: string;
     iqomahTime: string | null;
   }>;
-
   return {
     date: stored.date,
     prayers: prayers.map((p) => ({
@@ -47,8 +45,8 @@ function deserializeSchedule(
 }
 
 /**
- * Core prayer time calculation and persistence engine.
- * Uses adhan-js for calculation and Dexie for storage.
+ * Core prayer time calculation engine.
+ * Dhuha dihitung sebagai sunrise + dhuhaMinutesAfterSunrise menit.
  */
 export class PrayerEngine {
   private calculationConfig: PrayerCalculationConfig;
@@ -65,46 +63,59 @@ export class PrayerEngine {
     this.coords = coords;
   }
 
-  /**
-   * Calculates prayer times for a single day.
-   * Applies manual minute offsets from calculationConfig.
-   * Attaches iqomah times to each prayer (except Syuruq).
-   */
+  /** Calculates prayer times for a single day including Dhuha. */
   calculateDay(date: Date): DailyPrayerSchedule {
     const coords = new Coordinates(this.coords.latitude, this.coords.longitude);
-
     const params = getCalculationMethod(this.calculationConfig.method);
     params.madhab = getAsrMethod(this.calculationConfig.asrMethod);
 
     const pt = new PrayerTimes(coords, date, params);
     const offsets = this.calculationConfig.offsets;
     const iqomahDurations = this.iqomahConfig.durations;
+    const dhuhaOffset = this.calculationConfig.dhuhaMinutesAfterSunrise ?? 20;
 
-    const prayers: PrayerTime[] = PRAYER_KEYS.map((key) => {
-      const rawTime: Date =
-        pt[
-          key === "fajr"
-            ? "fajr"
-            : key === "sunrise"
-              ? "sunrise"
-              : key === "dhuhr"
-                ? "dhuhr"
-                : key === "asr"
-                  ? "asr"
-                  : key === "maghrib"
-                    ? "maghrib"
-                    : "isha"
-        ];
+    // Hitung waktu dasar dari adhan
+    const rawTimes: Record<string, Date> = {
+      fajr: pt.fajr,
+      sunrise: pt.sunrise,
+      dhuhr: pt.dhuhr,
+      asr: pt.asr,
+      maghrib: pt.maghrib,
+      isha: pt.isha,
+    };
 
-      const time = addMinutes(rawTime, offsets[key]);
+    // Dhuha = sunrise + dhuhaOffset menit + offset kustom dhuha
+    const sunriseWithOffset = addMinutes(
+      rawTimes.sunrise,
+      offsets["sunrise"] ?? 0,
+    );
+    rawTimes["dhuha"] = addMinutes(sunriseWithOffset, dhuhaOffset);
 
-      // Syuruq (sunrise) has no iqomah
+    const ORDERED_KEYS: PrayerKey[] = [
+      "fajr",
+      "sunrise",
+      "dhuha",
+      "dhuhr",
+      "asr",
+      "maghrib",
+      "isha",
+    ];
+
+    const prayers: PrayerTime[] = ORDERED_KEYS.map((key) => {
+      const base = rawTimes[key];
+      // Untuk dhuha, offset sudah dimasukkan saat hitung, tapi tetap tambah offset kustom
+      const time =
+        key === "dhuha"
+          ? addMinutes(base, offsets["dhuha"] ?? 0)
+          : addMinutes(base, offsets[key] ?? 0);
+
+      // Syuruq dan Dhuha tidak punya iqomah
       const iqomahTime =
-        key !== "sunrise" && key in iqomahDurations
+        key !== "sunrise" && key !== "dhuha" && key in iqomahDurations
           ? addMinutes(
-              time,
-              iqomahDurations[key as Exclude<PrayerKey, "sunrise">],
-            )
+            time,
+            iqomahDurations[key as Exclude<PrayerKey, "sunrise" | "dhuha">],
+          )
           : null;
 
       return {
@@ -118,20 +129,13 @@ export class PrayerEngine {
     return { date: dateToKey(date), prayers };
   }
 
-  /**
-   * Pre-computes prayer schedules for 365 days starting from startDate.
-   * Saves all results to IndexedDB in a single bulkPut call.
-   * Should be called once when setup is complete or location changes.
-   */
+  /** Pre-computes prayer schedules for 365 days. */
   async calculateYear(startDate: Date): Promise<void> {
     const schedules: StoredPrayerSchedule[] = [];
-
     for (let i = 0; i < 365; i++) {
       const date = new Date(startDate);
       date.setDate(date.getDate() + i);
-
       const daily = this.calculateDay(date);
-
       schedules.push({
         date: daily.date,
         prayersJson: JSON.stringify(
@@ -144,106 +148,73 @@ export class PrayerEngine {
         ),
       });
     }
-
     await savePrayerSchedules(schedules);
   }
 
-  /**
-   * Returns the prayer schedule for today.
-   * Falls back to live calculation if IndexedDB has no entry for today.
-   */
+  /** Returns today's schedule, falling back to live calculation. */
   async getTodaySchedule(): Promise<DailyPrayerSchedule> {
     const key = dateToKey(new Date());
-
     try {
       const stored = await getPrayerSchedule(key);
       if (stored) return deserializeSchedule(stored);
     } catch {
-      // fall through to live calculation
+      /* fall through */
     }
-
-    // Fallback: calculate on the fly (offline, no pre-computed data)
     return this.calculateDay(new Date());
   }
 
-  /**
-   * Checks if 365-day pre-computation is needed.
-   * Returns true if the DB has fewer than 300 entries
-   * (allows for partial data / year rollover).
-   */
   async needsPrecomputation(): Promise<boolean> {
     const count = await getPrayerScheduleCount();
     return count < 300;
   }
 
-  /**
-   * Clears all stored schedules and re-computes from today.
-   * Called when location or calculation method changes.
-   */
   async recompute(): Promise<void> {
     await clearPrayerSchedules();
     await this.calculateYear(new Date());
   }
 
   /**
-   * Given the current time and today's prayer list, returns the next prayer
-   * along with remaining seconds and current status.
-   *
-   * Status:
-   *  - "adzan"   → within 0–30s after prayer time (adzan window)
-   *  - "iqomah"  → between adzan end and iqomah time
-   *  - "normal"  → countdown to next prayer
+   * Returns the next upcoming prayer and its status.
+   * Dhuha tidak trigger adzan — skip saat cek adzan window.
    */
   getNextPrayer(now: Date, prayers: PrayerTime[]): NextPrayer | null {
     const nowMs = now.getTime();
 
-    // Find the next prayer whose time is still in the future
-    const upcoming = prayers.find((p) => p.time.getTime() > nowMs);
-
-    if (upcoming) {
-      const remainingSeconds = Math.floor(
-        (upcoming.time.getTime() - nowMs) / 1000,
-      );
-      return {
-        prayer: upcoming,
-        remainingSeconds,
-        status: "normal",
-      };
-    }
-
-    // All prayers have passed — find the last one and check adzan/iqomah window
     const lastPrayer = [...prayers]
       .reverse()
       .find((p) => p.time.getTime() <= nowMs);
 
-    if (!lastPrayer) return null;
+    if (lastPrayer) {
+      const secondsSince = Math.floor(
+        (nowMs - lastPrayer.time.getTime()) / 1000,
+      );
 
-    const secondsSincePrayer = Math.floor(
-      (nowMs - lastPrayer.time.getTime()) / 1000,
-    );
+      if (secondsSince <= 30) {
+        return { prayer: lastPrayer, remainingSeconds: 0, status: "adzan" };
+      }
 
-    // Adzan window: 0–30 seconds after prayer time
-    if (secondsSincePrayer <= 30) {
-      return {
-        prayer: lastPrayer,
-        remainingSeconds: 0,
-        status: "adzan",
-      };
-    }
-
-    // Iqomah window: after adzan, before iqomah time
-    if (lastPrayer.iqomahTime) {
-      const iqomahMs = lastPrayer.iqomahTime.getTime();
-      if (nowMs < iqomahMs) {
-        return {
-          prayer: lastPrayer,
-          remainingSeconds: Math.floor((iqomahMs - nowMs) / 1000),
-          status: "iqomah",
-        };
+      if (lastPrayer.iqomahTime) {
+        const iqomahMs = lastPrayer.iqomahTime.getTime();
+        if (nowMs < iqomahMs) {
+          return {
+            prayer: lastPrayer,
+            remainingSeconds: Math.floor((iqomahMs - nowMs) / 1000),
+            status: "iqomah",
+          };
+        }
       }
     }
 
-    // Past last prayer and iqomah — nothing next today
+    const upcoming = prayers.find((p) => p.time.getTime() > nowMs);
+
+    if (upcoming) {
+      return {
+        prayer: upcoming,
+        remainingSeconds: Math.floor((upcoming.time.getTime() - nowMs) / 1000),
+        status: "normal",
+      };
+    }
+
     return null;
   }
 }

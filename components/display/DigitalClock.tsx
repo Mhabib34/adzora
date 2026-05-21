@@ -5,12 +5,6 @@ import { useDisplayStore } from "../../stores/useDisplayStore";
 import { useMosqueStore } from "../../stores/useMosqueStore";
 import { formatTime, formatDate } from "../../lib/utils/time";
 
-/**
- * Digital clock component.
- * Drives the global clock via requestAnimationFrame — not setInterval.
- * Updates useDisplayStore.now every second; all other components
- * read from the store rather than running their own timers.
- */
 export const DigitalClock = memo(function DigitalClock() {
   const setNow = useDisplayStore((s) => s.setNow);
   const now = useDisplayStore((s) => s.now);
@@ -19,22 +13,17 @@ export const DigitalClock = memo(function DigitalClock() {
   const rafRef = useRef<number | null>(null);
   const lastSecRef = useRef<number>(-1);
 
-  // RAF loop — single source of truth for the clock
   useEffect(() => {
     const tick = () => {
       const date = new Date();
       const sec = date.getSeconds();
-
       if (sec !== lastSecRef.current) {
         lastSecRef.current = sec;
         setNow(date);
       }
-
       rafRef.current = requestAnimationFrame(tick);
     };
-
     rafRef.current = requestAnimationFrame(tick);
-
     return () => {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
@@ -45,18 +34,21 @@ export const DigitalClock = memo(function DigitalClock() {
 
   return (
     <div className="flex flex-col">
-      {/* Time — minimum 8rem per spec */}
+      {/* Big time */}
       <span
-        className="font-bold tabular-nums leading-none text-primary-foreground"
+        className="font-bold tabular-nums leading-none text-white"
         style={{ fontSize: "var(--text-display-xl)" }}
       >
         {timeStr}
       </span>
 
-      {/* Date */}
+      {/* Date row: Indonesian date | divider | Hijri (hijri rendered separately in DisplayRoot) */}
       <span
-        className="mt-1 text-secondary capitalize"
-        style={{ fontSize: "var(--text-display-sm)" }}
+        className="mt-2 capitalize"
+        style={{
+          fontSize: "var(--text-display-sm)",
+          color: "var(--color-secondary)",
+        }}
       >
         {dateStr}
       </span>
