@@ -1,24 +1,24 @@
 export type PrayerName =
+  | "Imsak"
   | "Subuh"
   | "Syuruq"
-  | "Dhuha"
   | "Dzuhur"
   | "Ashar"
   | "Maghrib"
   | "Isya";
 export type PrayerKey =
+  | "imsak"
   | "fajr"
   | "sunrise"
-  | "dhuha"
   | "dhuhr"
   | "asr"
   | "maghrib"
   | "isha";
 
 export const PRAYER_KEY_TO_NAME: Record<PrayerKey, PrayerName> = {
+  imsak: "Imsak",
   fajr: "Subuh",
   sunrise: "Syuruq",
-  dhuha: "Dhuha",
   dhuhr: "Dzuhur",
   asr: "Ashar",
   maghrib: "Maghrib",
@@ -26,9 +26,9 @@ export const PRAYER_KEY_TO_NAME: Record<PrayerKey, PrayerName> = {
 };
 
 export const PRAYER_KEYS: PrayerKey[] = [
+  "imsak",
   "fajr",
   "sunrise",
-  "dhuha",
   "dhuhr",
   "asr",
   "maghrib",
@@ -51,8 +51,8 @@ export interface PrayerCalculationConfig {
   method: CalculationMethodKey;
   asrMethod: AsrMethodKey;
   offsets: Record<PrayerKey, number>;
-  /** Menit setelah Syuruq untuk menghitung waktu Dhuha. Default: 20 */
-  dhuhaMinutesAfterSunrise: number;
+  /** Menit sebelum Subuh untuk menghitung waktu Imsak. Default: 10 */
+  imsakMinutesBeforeFajr: number;
 }
 
 export type CalculationMethodKey =
@@ -63,7 +63,7 @@ export type CalculationMethodKey =
 export type AsrMethodKey = "Shafi" | "Hanafi";
 
 export interface IqomahConfig {
-  durations: Record<Exclude<PrayerKey, "sunrise" | "dhuha">, number>;
+  durations: Record<Exclude<PrayerKey, "imsak" | "sunrise">, number>;
 }
 
 export interface NextPrayer {

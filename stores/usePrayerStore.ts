@@ -12,7 +12,7 @@ interface PrayerState {
   setCalculationConfig: (c: Partial<PrayerCalculationConfig>) => void;
   setOffset: (key: PrayerKey, minutes: number) => void;
   setIqomahDuration: (
-    key: Exclude<PrayerKey, "sunrise" | "dhuha">,
+    key: Exclude<PrayerKey, "imsak" | "sunrise">,
     minutes: number,
   ) => void;
   resetCalculationConfig: () => void;
@@ -22,15 +22,15 @@ const defaultCalc: PrayerCalculationConfig = {
   method: "MoonsightingCommittee",
   asrMethod: "Shafi",
   offsets: {
+    imsak: 0,
     fajr: 0,
     sunrise: 0,
-    dhuha: 0,
     dhuhr: 0,
     asr: 0,
     maghrib: 0,
     isha: 0,
   },
-  dhuhaMinutesAfterSunrise: 20,
+  imsakMinutesBeforeFajr: 10,
 };
 
 const defaultIqomah: IqomahConfig = {

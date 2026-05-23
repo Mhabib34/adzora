@@ -46,7 +46,8 @@ export default function AdminDashboardPage() {
 
     engine.getTodaySchedule().then((schedule) => {
       if (!isMounted) return;
-      currentPrayers = schedule.prayers;
+      // Filter out sunrise for the display purposes
+      currentPrayers = schedule.prayers.filter(p => p.key !== "sunrise");
       setTodayPrayers(currentPrayers);
       setNextPrayer(engine.getNextPrayer(new Date(), currentPrayers));
     });

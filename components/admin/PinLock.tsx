@@ -20,10 +20,12 @@ export const PinLock = memo(function PinLock({
 }: {
   children: React.ReactNode;
 }) {
-  const { pin, isUnlocked, unlock, lock } = useAdminStore();
+  const { pin, isUnlocked, hasSetPin, setPin, setHasSetPin, unlock, lock, _hasHydrated } = useAdminStore();
   const [input, setInput] = useState("");
   const [error, setError] = useState(false);
   const [shake, setShake] = useState(false);
+  const [setupStep, setSetupStep] = useState<"enter" | "confirm">("enter");
+  const [tempPin, setTempPin] = useState("");
   const inactivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /** Reset inactivity timer on any user interaction */
@@ -52,21 +54,48 @@ export const PinLock = memo(function PinLock({
       const next = input + digit;
       setInput(next);
       if (next.length === PIN_LENGTH) {
-        if (next === pin) {
-          unlock();
-          setInput("");
-        } else {
-          setError(true);
-          setShake(true);
-          setTimeout(() => {
+        if (!hasSetPin) {
+          // Setup flow
+          if (setupStep === "enter") {
+            setTempPin(next);
+            setSetupStep("confirm");
             setInput("");
-            setError(false);
-            setShake(false);
-          }, 600);
+          } else {
+            if (next === tempPin) {
+              setPin(next);
+              setHasSetPin(true);
+              unlock();
+              setInput("");
+            } else {
+              setError(true);
+              setShake(true);
+              setTimeout(() => {
+                setSetupStep("enter");
+                setTempPin("");
+                setInput("");
+                setError(false);
+                setShake(false);
+              }, 600);
+            }
+          }
+        } else {
+          // Normal login flow
+          if (next === pin) {
+            unlock();
+            setInput("");
+          } else {
+            setError(true);
+            setShake(true);
+            setTimeout(() => {
+              setInput("");
+              setError(false);
+              setShake(false);
+            }, 600);
+          }
         }
       }
     },
-    [input, pin, unlock],
+    [input, pin, unlock, hasSetPin, setupStep, tempPin, setPin, setHasSetPin],
   );
 
   const handleDelete = useCallback(() => {
@@ -84,6 +113,15 @@ export const PinLock = memo(function PinLock({
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [isUnlocked, handleDigit, handleDelete]);
+
+  /** Render loading if not hydrated yet */
+  if (!_hasHydrated) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-[--color-background]">
+        <div className="text-white/30 animate-pulse text-sm">Memuat sesi...</div>
+      </div>
+    );
+  }
 
   /** Render children + tombol lock jika sudah unlock */
   if (isUnlocked) {
@@ -118,9 +156,19 @@ export const PinLock = memo(function PinLock({
       </div>
 
       {/* Title */}
-      <h1 className="mb-2 text-2xl font-semibold">Panel Admin</h1>
+      <h1 className="mb-2 text-2xl font-semibold">
+        {!hasSetPin
+          ? setupStep === "enter"
+            ? "Buat PIN Baru"
+            : "Konfirmasi PIN"
+          : "Panel Admin"}
+      </h1>
       <p className="mb-8 text-sm text-white/50">
-        Masukkan PIN untuk melanjutkan
+        {!hasSetPin
+          ? setupStep === "enter"
+            ? "Masukkan 6 digit PIN untuk melindungi panel admin"
+            : "Masukkan kembali PIN yang baru Anda buat"
+          : "Masukkan PIN untuk melanjutkan"}
       </p>
 
       {/* PIN dots */}
@@ -145,7 +193,7 @@ export const PinLock = memo(function PinLock({
       <p
         className={`mb-4 text-sm text-red-400 transition-opacity ${error ? "opacity-100" : "opacity-0"}`}
       >
-        PIN salah. Coba lagi.
+        {!hasSetPin ? "PIN tidak cocok. Ulangi." : "PIN salah. Coba lagi."}
       </p>
 
       {/* Numpad */}

@@ -45,7 +45,7 @@ const CALCULATION_METHODS: {
     },
   ];
 
-const IQOMAH_KEYS: Exclude<PrayerKey, "sunrise" | "dhuha">[] = [
+const IQOMAH_KEYS: Exclude<PrayerKey, "imsak" | "sunrise">[] = [
   "fajr",
   "dhuhr",
   "asr",
@@ -77,10 +77,10 @@ export default function PrayerPage() {
     calculationConfig.offsets
   );
   const [iqomah, setIqomah] = useState<
-    Record<Exclude<PrayerKey, "sunrise" | "dhuha">, number>
+    Record<Exclude<PrayerKey, "imsak" | "sunrise">, number>
   >(iqomahConfig.durations);
-  const [dhuhaMinutes, setDhuhaMinutes] = useState(
-    calculationConfig.dhuhaMinutesAfterSunrise ?? 20,
+  const [imsakMinutes, setImsakMinutes] = useState(
+    calculationConfig.imsakMinutesBeforeFajr ?? 10,
   );
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
     "idle",
@@ -90,13 +90,13 @@ export default function PrayerPage() {
   /** Update local offset state */
   const handleOffsetChange = useCallback((key: PrayerKey, val: string) => {
     const n = parseInt(val, 10);
-    const clamped = isNaN(n) ? 0 : Math.max(-120, Math.min(120, n));
+    const clamped = isNaN(n) ? 0 : Math.max(-1440, Math.min(1440, n));
     setOffsets((prev) => ({ ...prev, [key]: clamped }));
   }, []);
 
   /** Update local iqomah state */
   const handleIqomahChange = useCallback(
-    (key: Exclude<PrayerKey, "sunrise" | "dhuha">, val: string) => {
+    (key: Exclude<PrayerKey, "imsak" | "sunrise">, val: string) => {
       const n = parseInt(val, 10);
       const clamped = isNaN(n) ? 5 : Math.max(1, Math.min(60, n));
       setIqomah((prev) => ({ ...prev, [key]: clamped }));
@@ -111,7 +111,7 @@ export default function PrayerPage() {
       method,
       asrMethod,
       offsets,
-      dhuhaMinutesAfterSunrise: dhuhaMinutes,
+      imsakMinutesBeforeFajr: imsakMinutes,
     });
     PRAYER_KEYS.forEach((k) => setOffset(k, offsets[k]));
     IQOMAH_KEYS.forEach((k) => setIqomahDuration(k, iqomah[k]));
@@ -128,7 +128,7 @@ export default function PrayerPage() {
     asrMethod,
     offsets,
     iqomah,
-    dhuhaMinutes,
+    imsakMinutes,
     setCalculationConfig,
     setOffset,
     setIqomahDuration,
@@ -142,13 +142,13 @@ export default function PrayerPage() {
     setOffsets({
       fajr: 0,
       sunrise: 0,
-      dhuha: 0,
+      imsak: 0,
       dhuhr: 0,
       asr: 0,
       maghrib: 0,
       isha: 0,
     });
-    setDhuhaMinutes(20);
+    setImsakMinutes(10);
     setIqomah({ fajr: 10, dhuhr: 10, asr: 10, maghrib: 5, isha: 10 });
     setShowResetConfirm(false);
   }, [resetCalculationConfig]);
@@ -255,7 +255,7 @@ export default function PrayerPage() {
           title="Koreksi Waktu (menit)"
         >
           <p className="text-xs text-white/40 -mt-1 mb-3">
-            Nilai positif = mundurkan, negatif = majukan. Rentang: −120 s/d +120
+            Nilai positif = mundurkan, negatif = majukan. Rentang: −1440 s/d +1440
             menit.
           </p>
           <div className="space-y-3">
@@ -275,8 +275,8 @@ export default function PrayerPage() {
                   </button>
                   <input
                     type="number"
-                    min={-120}
-                    max={120}
+                    min={-1440}
+                    max={1440}
                     value={offsets[key]}
                     onChange={(e) => handleOffsetChange(key, e.target.value)}
                     className="flex-1 text-center rounded-xl px-2 py-2 text-sm bg-white/5 border border-white/10 text-white focus:border-[--color-primary]/60 outline-none transition-colors font-mono"
@@ -298,18 +298,18 @@ export default function PrayerPage() {
           </div>
         </Section>
 
-        {/* Dhuha Minutes */}
-        <Section icon={<Clock className="w-4 h-4" />} title="Waktu Dhuha">
+        {/* Imsak Minutes */}
+        <Section icon={<Clock className="w-4 h-4" />} title="Waktu Imsak">
           <p className="text-xs text-white/40 -mt-1 mb-3">
-            Dhuha dihitung otomatis: Syuruq + menit di bawah.
+            Imsak dihitung otomatis: Subuh − menit di bawah.
           </p>
           <div className="flex items-center gap-3">
             <span className="w-40 text-sm font-semibold text-white/70 shrink-0">
-              Menit setelah Syuruq
+              Menit sebelum Subuh
             </span>
             <div className="flex items-center gap-2 flex-1">
               <button
-                onClick={() => setDhuhaMinutes((v) => Math.max(5, v - 5))}
+                onClick={() => setImsakMinutes((v) => Math.max(5, v - 5))}
                 className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/60 font-bold transition-colors"
               >
                 −
@@ -318,15 +318,15 @@ export default function PrayerPage() {
                 type="number"
                 min={5}
                 max={60}
-                value={dhuhaMinutes}
+                value={imsakMinutes}
                 onChange={(e) => {
                   const n = parseInt(e.target.value, 10);
-                  setDhuhaMinutes(isNaN(n) ? 20 : Math.max(5, Math.min(60, n)));
+                  setImsakMinutes(isNaN(n) ? 10 : Math.max(5, Math.min(60, n)));
                 }}
                 className="flex-1 text-center rounded-xl px-2 py-2 text-sm bg-white/5 border border-white/10 text-white focus:border-[--color-primary]/60 outline-none transition-colors font-mono"
               />
               <button
-                onClick={() => setDhuhaMinutes((v) => Math.min(60, v + 5))}
+                onClick={() => setImsakMinutes((v) => Math.min(60, v + 5))}
                 className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/60 font-bold transition-colors"
               >
                 +

@@ -4,6 +4,8 @@ import React, { useEffect, useRef, memo } from "react";
 import { ScheduleEngine } from "../../engines/ScheduleEngine";
 import { useThemeStore } from "../../stores/useThemeStore";
 import { useMosqueStore } from "../../stores/useMosqueStore";
+import { useAdminStore } from "../../stores/useAdminStore";
+import { useRouter } from "next/navigation";
 import { DigitalClock } from "./DigitalClock";
 import { PrayerSchedule } from "./PrayerSchedule";
 import { IqomahCountdown } from "./IqomahCountdown";
@@ -11,6 +13,9 @@ import { HijriCalendar } from "./HijriCalendar";
 import { RunningText } from "./RunningText";
 import { Slideshow } from "./Slideshow";
 import { AdzanOverlay } from "./AdzanOverlay";
+import { VERSES } from "../../data/verses";
+import { useDisplayStore } from "../../stores/useDisplayStore";
+import { useContentStore } from "../../stores/useContentStore";
 
 // ─── Error Boundary ──────────────────────────────────────────────────────────
 
@@ -69,25 +74,45 @@ function GeometricBackground() {
   );
 }
 
-/** Static Quran verse panel */
+/** Dynamic Quran/Hadith panel */
 function QuranPanel() {
+  const nextPrayer = useDisplayStore((s) => s.nextPrayer);
+  
+  const verse = React.useMemo(() => {
+    // Generate a deterministic index based on the day of the year and the next prayer key
+    const date = new Date();
+    const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / 1000 / 60 / 60 / 24);
+    
+    // Hash the prayer key to an integer
+    let prayerHash = 0;
+    if (nextPrayer?.prayer.key) {
+      for (let i = 0; i < nextPrayer.prayer.key.length; i++) {
+        prayerHash += nextPrayer.prayer.key.charCodeAt(i);
+      }
+    }
+    
+    const index = (dayOfYear + prayerHash) % VERSES.length;
+    return VERSES[index];
+  }, [nextPrayer?.prayer.key]);
+
   return (
     <div className="flex flex-col items-end justify-center rounded-2xl px-6 py-4 bg-surface">
+      {verse.arabic && (
+        <p
+          className="font-arabic text-right leading-relaxed text-secondary mb-3"
+          style={{
+            fontSize: "clamp(1.4rem, 2.2vw, 2.2rem)",
+            direction: "rtl",
+          }}
+        >
+          {verse.arabic}
+        </p>
+      )}
       <p
-        className="font-arabic text-right leading-relaxed text-secondary"
-        style={{
-          fontSize: "clamp(1.4rem, 2.2vw, 2.2rem)",
-          direction: "rtl",
-        }}
-      >
-        ٱلْمُؤْمِنِينَ كِتَٰبًا مَّوْقُوتًا
-      </p>
-      <p
-        className="mt-3 text-right italic text-white/70"
+        className="text-right italic text-white/70"
         style={{ fontSize: "clamp(0.9rem, 1.2vw, 1.2rem)" }}
       >
-        &ldquo;Sesungguhnya shalat itu adalah fardhu yang ditetapkan
-        waktunya&rdquo;
+        &ldquo;{verse.translation}&rdquo;
       </p>
       <p
         className="mt-1 text-right text-secondary"
@@ -95,7 +120,7 @@ function QuranPanel() {
           fontSize: "clamp(0.8rem, 1vw, 1rem)",
         }}
       >
-        — QS. An-Nisa: 103
+        — {verse.source}
       </p>
     </div>
   );
@@ -103,6 +128,10 @@ function QuranPanel() {
 
 /** Event card panel */
 function EventCard() {
+  const eventItem = useContentStore((s) => s.eventItem);
+
+  if (!eventItem?.isActive) return null;
+
   return (
     <div
       className="flex items-center gap-4 rounded-2xl px-5 py-3 bg-surface"
@@ -128,9 +157,9 @@ function EventCard() {
       </div>
       <div>
         <p className="font-semibold tracking-widest uppercase text-sm text-secondary">
-          Kajian Rutin
+          {eventItem.title || "Info Acara"}
         </p>
-        <p className="mt-0.5 text-white/80 text-lg">Ba&apos;da Maghrib</p>
+        <p className="mt-0.5 text-white/80 text-lg">{eventItem.description}</p>
       </div>
     </div>
   );
@@ -152,28 +181,42 @@ const DisplayRootInner = memo(function DisplayRootInner() {
   const applyCSSVars = useThemeStore((s) => s.applyCSSVariables);
   const display = useMosqueStore((s) => s.display);
   const isSetupComplete = useMosqueStore((s) => s.config.isSetupComplete);
+  const hasSetPin = useAdminStore((s) => s.hasSetPin);
+  const hasHydrated = useAdminStore((s) => s._hasHydrated);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!hasHydrated) return;
+    if (!hasSetPin) {
+      router.replace("/admin");
+    } else if (!isSetupComplete) {
+      router.replace("/admin/setup");
+    }
+  }, [hasHydrated, hasSetPin, isSetupComplete, router]);
 
   useEffect(() => {
     applyCSSVars();
   }, [applyCSSVars]);
 
   useEffect(() => {
-    if (!isSetupComplete) return;
+    if (!isSetupComplete || !hasSetPin) return;
+
     const engine = new ScheduleEngine();
     engineRef.current = engine;
     void engine.init();
+    
     return () => {
       engine.destroy();
       engineRef.current = null;
     };
-  }, [isSetupComplete]);
+  }, [isSetupComplete, hasSetPin]);
 
-  if (!isSetupComplete) {
+  if (!hasHydrated || !isSetupComplete || !hasSetPin) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-background">
-        <p className="text-center text-white/60 text-2xl px-8">
-          Silakan selesaikan pengaturan awal di panel admin.
-        </p>
+      <div className="flex h-full w-full items-center justify-center bg-[--color-background]">
+        <div className="text-center text-white/50 space-y-4">
+          <p>Mengarahkan ke halaman pengaturan...</p>
+        </div>
       </div>
     );
   }

@@ -6,7 +6,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { RunningTextItem, AdzanAudioConfig } from "../types/content";
+import type { RunningTextItem, AdzanAudioConfig, EventItem } from "../types/content";
 
 /** Shape stored in localStorage — Date serialized as ISO string */
 interface PersistedRunningTextItem extends Omit<RunningTextItem, "createdAt"> {
@@ -16,6 +16,7 @@ interface PersistedRunningTextItem extends Omit<RunningTextItem, "createdAt"> {
 interface ContentState {
   runningTexts: RunningTextItem[];
   adzanAudio: AdzanAudioConfig;
+  eventItem: EventItem;
   // Actions
   setRunningTexts: (items: RunningTextItem[]) => void;
   addRunningText: (item: RunningTextItem) => void;
@@ -23,12 +24,14 @@ interface ContentState {
   deleteRunningText: (id: string) => void;
   reorderRunningTexts: (ids: string[]) => void;
   setAdzanAudio: (config: Partial<AdzanAudioConfig>) => void;
+  setEventItem: (item: Partial<EventItem>) => void;
 }
 
 /** Shape that actually gets written to localStorage */
 interface PersistedContentState {
   runningTexts: PersistedRunningTextItem[];
   adzanAudio: AdzanAudioConfig;
+  eventItem: EventItem;
 }
 
 const defaultAdzanAudio: AdzanAudioConfig = {
@@ -47,6 +50,12 @@ const defaultRunningTexts: RunningTextItem[] = [
   },
 ];
 
+const defaultEventItem: EventItem = {
+  title: "Kajian Rutin",
+  description: "Ba'da Maghrib",
+  isActive: true,
+};
+
 /** Rehydrate persisted items — convert createdAt string back to Date */
 function rehydrateItems(items: PersistedRunningTextItem[]): RunningTextItem[] {
   return items.map((t) => ({ ...t, createdAt: new Date(t.createdAt) }));
@@ -57,6 +66,7 @@ export const useContentStore = create<ContentState>()(
     (set) => ({
       runningTexts: defaultRunningTexts,
       adzanAudio: defaultAdzanAudio,
+      eventItem: defaultEventItem,
 
       setRunningTexts: (items) => set({ runningTexts: items }),
 
@@ -91,6 +101,11 @@ export const useContentStore = create<ContentState>()(
         set((state) => ({
           adzanAudio: { ...state.adzanAudio, ...partial },
         })),
+
+      setEventItem: (partial) =>
+        set((state) => ({
+          eventItem: { ...state.eventItem, ...partial },
+        })),
     }),
     {
       name: "adzora-content",
@@ -101,6 +116,7 @@ export const useContentStore = create<ContentState>()(
           createdAt: t.createdAt.toISOString(),
         })),
         adzanAudio: state.adzanAudio,
+        eventItem: state.eventItem,
       }),
       // Convert ISO strings back to Date on load
       onRehydrateStorage: () => (state) => {

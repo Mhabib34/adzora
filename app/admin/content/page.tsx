@@ -12,6 +12,7 @@ import {
   Radio,
   ToggleLeft,
   ToggleRight,
+  CalendarDays,
 } from "lucide-react";
 import { useContentStore } from "../../../stores/useContentStore";
 import type { RunningTextItem } from "../../../types/content";
@@ -27,6 +28,8 @@ export default function ContentPage() {
     updateRunningText,
     deleteRunningText,
     reorderRunningTexts,
+    eventItem,
+    setEventItem,
   } = useContentStore();
 
   const [newText, setNewText] = useState("");
@@ -114,12 +117,65 @@ export default function ContentPage() {
         {/* Header */}
         <div>
           <h1 className="text-2xl font-bold text-[--color-primary]">
-            Running Text
+            Konten Teks & Acara
           </h1>
           <p className="text-sm text-white/50 mt-1">
-            Kelola teks berjalan yang tampil di layar masjid.
+            Kelola teks berjalan dan kartu info acara (Kajian) di layar masjid.
           </p>
         </div>
+
+        {/* Event Card (Kajian Rutin) */}
+        <div className="bg-[--color-surface] rounded-2xl p-5 border border-white/5 space-y-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <CalendarDays className="w-4 h-4 text-[--color-secondary]" />
+              <h2 className="text-sm font-bold text-white/80 uppercase tracking-wider">
+                Kartu Info Acara / Kajian
+              </h2>
+            </div>
+            <button
+              onClick={() => setEventItem({ isActive: !eventItem.isActive })}
+              className={`flex items-center gap-2 text-xs rounded-lg px-3 py-1.5 transition-colors font-semibold ${
+                eventItem.isActive
+                  ? "bg-emerald-500/15 text-emerald-400"
+                  : "bg-white/5 text-white/35"
+              }`}
+            >
+              {eventItem.isActive ? (
+                <ToggleRight className="w-4 h-4" />
+              ) : (
+                <ToggleLeft className="w-4 h-4" />
+              )}
+              {eventItem.isActive ? "Aktif" : "Sembunyikan"}
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs text-white/40 mb-1.5 block">Judul Acara</label>
+              <input
+                type="text"
+                value={eventItem.title}
+                onChange={(e) => setEventItem({ title: e.target.value })}
+                placeholder="Misal: Kajian Rutin"
+                className="w-full rounded-xl px-4 py-2.5 text-sm bg-white/5 border border-white/10 text-white placeholder-white/20 focus:border-[--color-primary]/60 outline-none transition-colors"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-white/40 mb-1.5 block">Waktu / Keterangan</label>
+              <input
+                type="text"
+                value={eventItem.description}
+                onChange={(e) => setEventItem({ description: e.target.value })}
+                placeholder="Misal: Ba'da Maghrib"
+                className="w-full rounded-xl px-4 py-2.5 text-sm bg-white/5 border border-white/10 text-white placeholder-white/20 focus:border-[--color-primary]/60 outline-none transition-colors"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="h-px bg-white/5 w-full"></div>
 
         {/* Stats bar */}
         <div className="flex items-center gap-3">

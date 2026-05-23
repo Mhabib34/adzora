@@ -46,7 +46,7 @@ function deserializeSchedule(
 
 /**
  * Core prayer time calculation engine.
- * Dhuha dihitung sebagai sunrise + dhuhaMinutesAfterSunrise menit.
+ * Imsak dihitung sebagai fajr - imsakMinutesBeforeFajr menit.
  */
 export class PrayerEngine {
   private calculationConfig: PrayerCalculationConfig;
@@ -63,7 +63,7 @@ export class PrayerEngine {
     this.coords = coords;
   }
 
-  /** Calculates prayer times for a single day including Dhuha. */
+  /** Calculates prayer times for a single day including Imsak. */
   calculateDay(date: Date): DailyPrayerSchedule {
     const coords = new Coordinates(this.coords.latitude, this.coords.longitude);
     const params = getCalculationMethod(this.calculationConfig.method);
@@ -72,7 +72,7 @@ export class PrayerEngine {
     const pt = new PrayerTimes(coords, date, params);
     const offsets = this.calculationConfig.offsets;
     const iqomahDurations = this.iqomahConfig.durations;
-    const dhuhaOffset = this.calculationConfig.dhuhaMinutesAfterSunrise ?? 20;
+    const imsakOffset = this.calculationConfig.imsakMinutesBeforeFajr ?? 10;
 
     // Hitung waktu dasar dari adhan
     const rawTimes: Record<string, Date> = {
@@ -84,17 +84,17 @@ export class PrayerEngine {
       isha: pt.isha,
     };
 
-    // Dhuha = sunrise + dhuhaOffset menit + offset kustom dhuha
-    const sunriseWithOffset = addMinutes(
-      rawTimes.sunrise,
-      offsets["sunrise"] ?? 0,
+    // Imsak = fajr - imsakOffset menit + offset kustom imsak
+    const fajrWithOffset = addMinutes(
+      rawTimes.fajr,
+      offsets["fajr"] ?? 0,
     );
-    rawTimes["dhuha"] = addMinutes(sunriseWithOffset, dhuhaOffset);
+    rawTimes["imsak"] = addMinutes(fajrWithOffset, -imsakOffset);
 
     const ORDERED_KEYS: PrayerKey[] = [
+      "imsak",
       "fajr",
       "sunrise",
-      "dhuha",
       "dhuhr",
       "asr",
       "maghrib",
@@ -103,18 +103,18 @@ export class PrayerEngine {
 
     const prayers: PrayerTime[] = ORDERED_KEYS.map((key) => {
       const base = rawTimes[key];
-      // Untuk dhuha, offset sudah dimasukkan saat hitung, tapi tetap tambah offset kustom
+      // Untuk imsak, offset sudah dimasukkan saat hitung, tapi tetap tambah offset kustom
       const time =
-        key === "dhuha"
-          ? addMinutes(base, offsets["dhuha"] ?? 0)
+        key === "imsak"
+          ? addMinutes(base, offsets["imsak"] ?? 0)
           : addMinutes(base, offsets[key] ?? 0);
 
-      // Syuruq dan Dhuha tidak punya iqomah
+      // Syuruq dan Imsak tidak punya iqomah
       const iqomahTime =
-        key !== "sunrise" && key !== "dhuha" && key in iqomahDurations
+        key !== "sunrise" && key !== "imsak" && key in iqomahDurations
           ? addMinutes(
             time,
-            iqomahDurations[key as Exclude<PrayerKey, "sunrise" | "dhuha">],
+            iqomahDurations[key as Exclude<PrayerKey, "imsak" | "sunrise">],
           )
           : null;
 
@@ -151,12 +151,19 @@ export class PrayerEngine {
     await savePrayerSchedules(schedules);
   }
 
-  /** Returns today's schedule, falling back to live calculation. */
   async getTodaySchedule(): Promise<DailyPrayerSchedule> {
     const key = dateToKey(new Date());
     try {
       const stored = await getPrayerSchedule(key);
-      if (stored) return deserializeSchedule(stored);
+      if (stored) {
+        const schedule = deserializeSchedule(stored);
+        // Migrasi/Invalidasi otomatis jika cache lama masih mengandung "dhuha"
+        if (schedule.prayers.some((p) => p.key === ("dhuha" as any))) {
+          await clearPrayerSchedules();
+          return this.calculateDay(new Date());
+        }
+        return schedule;
+      }
     } catch {
       /* fall through */
     }
@@ -175,12 +182,16 @@ export class PrayerEngine {
 
   /**
    * Returns the next upcoming prayer and its status.
-   * Dhuha tidak trigger adzan — skip saat cek adzan window.
+   * Imsak tidak trigger adzan — skip saat cek adzan window.
    */
   getNextPrayer(now: Date, prayers: PrayerTime[]): NextPrayer | null {
     const nowMs = now.getTime();
 
-    const lastPrayer = [...prayers]
+    // Pastikan array selalu urut berdasarkan waktu aktual 
+    // (Sangat penting jika user memberikan offset ekstrem untuk testing yang mengubah urutan natural sholat)
+    const sortedPrayers = [...prayers].sort((a, b) => a.time.getTime() - b.time.getTime());
+
+    const lastPrayer = [...sortedPrayers]
       .reverse()
       .find((p) => p.time.getTime() <= nowMs);
 
@@ -205,12 +216,36 @@ export class PrayerEngine {
       }
     }
 
-    const upcoming = prayers.find((p) => p.time.getTime() > nowMs);
+    const upcoming = sortedPrayers.find((p) => p.time.getTime() > nowMs);
 
     if (upcoming) {
       return {
         prayer: upcoming,
         remainingSeconds: Math.floor((upcoming.time.getTime() - nowMs) / 1000),
+        status: "normal",
+      };
+    }
+
+    // Jika semua waktu sholat hari ini sudah lewat (biasanya setelah Isya),
+    // maka kita cari waktu sholat pertama di hari esok.
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // Hitung jadwal hari esok secara live (tanpa DB lookup agar tetap synchronous)
+    const tomorrowSchedule = this.calculateDay(tomorrow);
+    
+    // Filter jadwal esok hari agar sama dengan daftar parameter prayers (misal: membuang Syuruq)
+    const allowedKeys = new Set(prayers.map((p) => p.key));
+    const tomorrowAllowed = tomorrowSchedule.prayers.filter((p) => allowedKeys.has(p.key));
+    
+    // Urutkan jadwal esok hari dan ambil yang pertama
+    const tomorrowSorted = tomorrowAllowed.sort((a, b) => a.time.getTime() - b.time.getTime());
+    const tomorrowNext = tomorrowSorted[0];
+
+    if (tomorrowNext) {
+      return {
+        prayer: tomorrowNext,
+        remainingSeconds: Math.floor((tomorrowNext.time.getTime() - nowMs) / 1000),
         status: "normal",
       };
     }

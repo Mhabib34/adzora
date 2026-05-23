@@ -12,6 +12,12 @@ export interface RunningTextItem {
   createdAt: Date;
 }
 
+export interface EventItem {
+  title: string;
+  description: string;
+  isActive: boolean;
+}
+
 export interface SlideshowImage {
   id: string;
   /** Original filename */

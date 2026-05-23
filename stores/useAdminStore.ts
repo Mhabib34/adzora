@@ -6,9 +6,13 @@ interface AdminState {
   pin: string;
   /** Flag session — true selama tab browser tidak ditutup */
   isUnlocked: boolean;
-  setPin: (newPin: string) => void;
+  /** Flag apakah user sudah pernah membuat PIN */
+  hasSetPin: boolean;
+  setHasSetPin: (val: boolean) => void;
   unlock: () => void;
   lock: () => void;
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
 }
 
 /**
@@ -25,8 +29,12 @@ export const useAdminStore = create<AdminState>()(
   persist(
     (set) => ({
       pin: "123456",
+      hasSetPin: false,
       isUnlocked: false,
-      setPin: (newPin) => set({ pin: newPin }),
+      _hasHydrated: false,
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
+      setPin: (newPin: string) => set({ pin: newPin }),
+      setHasSetPin: (val) => set({ hasSetPin: val }),
       unlock: () => {
         set({ isUnlocked: true });
         sessionStorage.setItem("adzora-admin-unlocked", "1");
@@ -38,15 +46,15 @@ export const useAdminStore = create<AdminState>()(
     }),
     {
       name: "adzora-admin",
-      // Hanya simpan PIN ke localStorage, bukan isUnlocked
-      partialize: (s) => ({ pin: s.pin }),
-      // Saat rehydrate, cek sessionStorage untuk restore session
+      // Hanya simpan PIN dan status hasSetPin ke localStorage
+      partialize: (s) => ({ pin: s.pin, hasSetPin: s.hasSetPin }),
       onRehydrateStorage: () => (s) => {
         if (!s) return;
         const session = sessionStorage.getItem("adzora-admin-unlocked");
         if (session === "1") {
           s.isUnlocked = true;
         }
+        s.setHasHydrated(true);
       },
     },
   ),

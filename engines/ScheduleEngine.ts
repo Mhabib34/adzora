@@ -11,7 +11,7 @@ const ADZAN_WINDOW_SECONDS = 30;
 const AUTO_RESTART_HOUR = 3;
 
 /** Waktu-waktu yang tidak punya adzan */
-const NO_ADZAN_KEYS = new Set(["sunrise", "dhuha"]);
+const NO_ADZAN_KEYS = new Set(["imsak", "sunrise"]);
 
 /**
  * Top-level orchestrator — prayer calculation, audio, display state.
@@ -107,7 +107,7 @@ export class ScheduleEngine {
     const displayStore = useDisplayStore.getState();
 
     for (const prayer of prayers) {
-      // Syuruq dan Dhuha tidak punya adzan
+      // Imsak dan Syuruq tidak punya adzan
       if (NO_ADZAN_KEYS.has(prayer.key)) continue;
 
       const diffSeconds = Math.floor(
