@@ -178,13 +178,12 @@ export const PinLock = memo(function PinLock({
         {Array.from({ length: PIN_LENGTH }).map((_, i) => (
           <div
             key={i}
-            className={`h-4 w-4 rounded-full border-2 transition-colors ${
-              i < input.length
+            className={`h-4 w-4 rounded-full border-2 transition-colors ${i < input.length
                 ? error
                   ? "border-red-500 bg-red-500"
                   : "border-[--color-secondary] bg-[--color-secondary]"
                 : "border-white/20 bg-transparent"
-            }`}
+              }`}
           />
         ))}
       </div>

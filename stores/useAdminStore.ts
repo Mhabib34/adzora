@@ -9,6 +9,7 @@ interface AdminState {
   /** Flag apakah user sudah pernah membuat PIN */
   hasSetPin: boolean;
   setHasSetPin: (val: boolean) => void;
+  setPin: (newPin: string) => void;
   unlock: () => void;
   lock: () => void;
   _hasHydrated: boolean;
