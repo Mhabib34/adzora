@@ -3,7 +3,10 @@ import { PinLock } from "../../components/admin/PinLock";
 import { Sidebar } from "../../components/admin/Sidebar";
 
 export const metadata: Metadata = {
-  title: "Adzora Admin",
+  title: {
+    template: "%s | Adzora Admin",
+    default: "Dashboard | Adzora Admin",
+  },
 };
 
 /**

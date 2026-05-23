@@ -17,7 +17,10 @@ const scheherazade = Scheherazade_New({
 });
 
 export const metadata: Metadata = {
-  title: "Adzora — Digital Signage Masjid",
+  title: {
+    template: "%s | Adzora",
+    default: "Adzora — Digital Signage Masjid",
+  },
   description: "Sistem informasi digital untuk masjid Indonesia",
   manifest: "/manifest.json",
   appleWebApp: {
