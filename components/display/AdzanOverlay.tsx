@@ -19,7 +19,7 @@ export const AdzanOverlay = memo(function AdzanOverlay() {
       {isPlaying && (
         <motion.div
           key="adzan-overlay"
-          className="absolute inset-0 z-50 w-full h-screen flex flex-col items-center justify-center bg-background"
+          className="fixed inset-0 z-50 w-full h-screen flex flex-col items-center justify-center bg-background"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
