@@ -14,40 +14,42 @@ const PrayerRow = memo(function PrayerRow({
 }) {
   return (
     <div
-      className={`grid gap-4 flex-1 min-h-0 items-center px-4 py-2 rounded-lg transition-all ${isNext ? "bg-primary" : "bg-transparent"}`}
+      className={`relative grid gap-4 flex-1 min-h-0 items-center px-6 mx-4 rounded-xl transition-all overflow-hidden ${
+        isNext ? "bg-primary" : "bg-transparent"
+      }`}
       style={{
         gridTemplateColumns: "10rem 1fr 1fr",
-        borderLeft: isNext
-          ? "8px solid var(--color-secondary)"
-          : "8px solid transparent",
       }}
     >
+      {/* Active Indicator */}
+      {isNext && (
+        <div className="absolute left-0 top-0 bottom-0 w-2 bg-secondary" />
+      )}
+
       {/* Prayer name: Indonesian + Arabic */}
       <span
-        className={`font-semibold text-4xl ${isNext ? "text-white" : "text-white/80"}`}
+        className={`font-semibold text-4xl z-10 ${isNext ? "text-white" : "text-white/80"}`}
       >
         {prayer.name}
       </span>
 
       {/* Adzan time */}
       <span
-        className={`tabular-nums text-center font-bold ${isNext ? "text-white" : "text-white/80"}`}
+        className={`tabular-nums text-center font-bold z-10 ${isNext ? "text-white" : "text-white/80"}`}
         style={{ fontSize: "var(--text-display-sm)" }}
       >
         {formatTime(prayer.time, false)}
       </span>
 
       {/* Iqomah */}
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center z-10">
         {prayer.iqomahTime ? (
-          <>
-            <span
-              className={`tabular-nums font-bold ${isNext ? "text-white" : "text-white/60"}`}
-              style={{ fontSize: "var(--text-display-sm)" }}
-            >
-              {formatTime(prayer.iqomahTime, false)}
-            </span>
-          </>
+          <span
+            className={`tabular-nums font-bold ${isNext ? "text-white" : "text-white/60"}`}
+            style={{ fontSize: "var(--text-display-sm)" }}
+          >
+            {formatTime(prayer.iqomahTime, false)}
+          </span>
         ) : (
           <span
             className="text-white/30"
@@ -77,28 +79,28 @@ export const PrayerSchedule = memo(function PrayerSchedule() {
   }
 
   return (
-    <div className="flex flex-col rounded-2xl overflow-hidden h-full bg-surface">
+    <div className="flex flex-col rounded-2xl overflow-hidden h-full bg-surface py-4 shadow-lg border border-white/5">
       {/* Table header */}
       <div
-        className="grid px-4 py-2 shrink-0"
-        style={{ gridTemplateColumns: "10rem 1fr 1fr", gap: "0 1rem" }}
+        className="grid px-10 shrink-0 mb-2"
+        style={{ gridTemplateColumns: "10rem 1fr 1fr", gap: "1rem" }}
       >
-        <span className="font-semibold tracking-widest uppercase text-secondary text-xl">
+        <span className="font-semibold tracking-widest uppercase text-secondary/90 text-xl">
           Waktu
         </span>
-        <span className="text-center font-semibold tracking-widest uppercase text-secondary text-xl">
+        <span className="text-center font-semibold tracking-widest uppercase text-secondary/90 text-xl">
           Adzan
         </span>
-        <span className="text-center font-semibold tracking-widest uppercase text-secondary text-xl">
+        <span className="text-center font-semibold tracking-widest uppercase text-secondary/90 text-xl">
           Iqomah
         </span>
       </div>
 
       {/* Divider */}
-      <div className="mx-4 mb-1 h-px opacity-20 bg-secondary shrink-0" />
+      <div className="mx-10 mb-3 h-px opacity-20 bg-secondary shrink-0" />
 
       {/* Prayer rows */}
-      <div className="flex flex-col gap-0.5 pb-2 flex-1 min-h-0">
+      <div className="flex flex-col gap-1 pb-2 flex-1 min-h-0">
         {prayers.map((prayer) => (
           <PrayerRow
             key={prayer.key}

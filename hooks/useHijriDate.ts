@@ -7,6 +7,8 @@ import {
 import { dateToKey } from "../lib/utils/time";
 import { useDisplayStore } from "../stores/useDisplayStore";
 
+import { useMosqueStore } from "../stores/useMosqueStore";
+
 export interface HijriDateResult {
   hijri: HijriDate;
   /** e.g. "15 Ramadan 1446 H" */
@@ -19,15 +21,19 @@ export interface HijriDateResult {
  */
 export function useHijriDate(): HijriDateResult {
   const now = useDisplayStore((s) => s.now);
+  const hijriOffset = useMosqueStore((s) => s.config.hijriOffset ?? 0);
 
   // Stable string key — changes only when calendar date rolls over
-  const dateKey = dateToKey(now);
+  const dateKey = dateToKey(now) + "_" + hijriOffset;
 
   return useMemo(
-    () => ({
-      hijri: toHijri(now),
-      formatted: formatHijriDate(now),
-    }),
+    () => {
+      const adjustedDate = new Date(now.getTime() + hijriOffset * 24 * 60 * 60 * 1000);
+      return {
+        hijri: toHijri(adjustedDate),
+        formatted: formatHijriDate(adjustedDate),
+      };
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [dateKey],
   );

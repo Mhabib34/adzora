@@ -10,6 +10,7 @@ import {
   Info,
 } from "lucide-react";
 import { usePrayerStore } from "../../../stores/usePrayerStore";
+import { useMosqueStore } from "../../../stores/useMosqueStore";
 import { clearPrayerSchedules } from "../../../db/MasjidDB";
 import type {
   PrayerKey,
@@ -67,6 +68,8 @@ export default function PrayerPage() {
     resetCalculationConfig,
   } = usePrayerStore();
 
+  const { config, setConfig } = useMosqueStore();
+
   const [method, setMethod] = useState<CalculationMethodKey>(
     calculationConfig.method,
   );
@@ -82,6 +85,7 @@ export default function PrayerPage() {
   const [imsakMinutes, setImsakMinutes] = useState(
     calculationConfig.imsakMinutesBeforeFajr ?? 10,
   );
+  const [hijriOffset, setHijriOffset] = useState(config.hijriOffset ?? 0);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
     "idle",
   );
@@ -90,7 +94,7 @@ export default function PrayerPage() {
   /** Update local offset state */
   const handleOffsetChange = useCallback((key: PrayerKey, val: string) => {
     const n = parseInt(val, 10);
-    const clamped = isNaN(n) ? 0 : Math.max(-1440, Math.min(1440, n));
+    const clamped = isNaN(n) ? 0 : Math.max(-60, Math.min(60, n));
     setOffsets((prev) => ({ ...prev, [key]: clamped }));
   }, []);
 
@@ -113,6 +117,7 @@ export default function PrayerPage() {
       offsets,
       imsakMinutesBeforeFajr: imsakMinutes,
     });
+    setConfig({ hijriOffset });
     PRAYER_KEYS.forEach((k) => setOffset(k, offsets[k]));
     IQOMAH_KEYS.forEach((k) => setIqomahDuration(k, iqomah[k]));
 
@@ -129,7 +134,9 @@ export default function PrayerPage() {
     offsets,
     iqomah,
     imsakMinutes,
+    hijriOffset,
     setCalculationConfig,
+    setConfig,
     setOffset,
     setIqomahDuration,
   ]);
@@ -255,7 +262,7 @@ export default function PrayerPage() {
           title="Koreksi Waktu (menit)"
         >
           <p className="text-xs text-white/40 -mt-1 mb-3">
-            Nilai positif = mundurkan, negatif = majukan. Rentang: −1440 s/d +1440
+            Nilai positif = mundurkan, negatif = majukan. Rentang: −60 s/d +60
             menit.
           </p>
           <div className="space-y-3">
@@ -275,8 +282,8 @@ export default function PrayerPage() {
                   </button>
                   <input
                     type="number"
-                    min={-1440}
-                    max={1440}
+                    min={-60}
+                    max={60}
                     value={offsets[key]}
                     onChange={(e) => handleOffsetChange(key, e.target.value)}
                     className="flex-1 text-center rounded-xl px-2 py-2 text-sm bg-white/5 border border-white/10 text-white focus:border-[--color-primary]/60 outline-none transition-colors font-mono"
@@ -333,6 +340,46 @@ export default function PrayerPage() {
               </button>
               <span className="text-xs text-white/30 w-8 text-right shrink-0">
                 mnt
+              </span>
+            </div>
+          </div>
+        </Section>
+
+        {/* Hijri Offset */}
+        <Section icon={<Clock className="w-4 h-4" />} title="Koreksi Hari Hijriah">
+          <p className="text-xs text-white/40 -mt-1 mb-3">
+            Koreksi penanggalan Hijriah jika meleset (misal karena rukyatul hilal). Rentang: -2 s/d +2 hari.
+          </p>
+          <div className="flex items-center gap-3">
+            <span className="w-40 text-sm font-semibold text-white/70 shrink-0">
+              Koreksi Hari
+            </span>
+            <div className="flex items-center gap-2 flex-1">
+              <button
+                onClick={() => setHijriOffset((v) => Math.max(-2, v - 1))}
+                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/60 font-bold transition-colors"
+              >
+                −
+              </button>
+              <input
+                type="number"
+                min={-2}
+                max={2}
+                value={hijriOffset}
+                onChange={(e) => {
+                  const n = parseInt(e.target.value, 10);
+                  setHijriOffset(isNaN(n) ? 0 : Math.max(-2, Math.min(2, n)));
+                }}
+                className="flex-1 text-center rounded-xl px-2 py-2 text-sm bg-white/5 border border-white/10 text-white focus:border-[--color-primary]/60 outline-none transition-colors font-mono"
+              />
+              <button
+                onClick={() => setHijriOffset((v) => Math.min(2, v + 1))}
+                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/60 font-bold transition-colors"
+              >
+                +
+              </button>
+              <span className="text-xs text-white/30 w-8 text-right shrink-0">
+                hari
               </span>
             </div>
           </div>

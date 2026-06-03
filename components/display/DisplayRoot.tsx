@@ -74,6 +74,18 @@ const DisplayRootInner = memo(function DisplayRootInner() {
     applyCSSVars();
   }, [applyCSSVars]);
 
+  // Reload display automatically when settings are changed in another tab (Admin)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      // If any of our stores change, reload to apply new settings & schedule
+      if (e.key && e.key.startsWith("adzora-")) {
+        window.location.reload();
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
   useEffect(() => {
     if (!isSetupComplete || !hasSetPin) return;
 

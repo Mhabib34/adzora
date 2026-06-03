@@ -14,18 +14,24 @@ export const HijriCalendar = memo(function HijriCalendar() {
   const arabicDate = `${hijri.day} ${getArabicMonthName(hijri.month)} ${hijri.year} هـ`;
 
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-3 items-center whitespace-nowrap">
       {/* Latin version */}
-      <span className="text-secondary text-4xl">{formatted.toUpperCase()}</span>
+      <span
+        className="text-secondary"
+        style={{ fontSize: "var(--text-display-sm)" }}
+      >
+        {formatted.toUpperCase()}
+      </span>
 
       {/* Divider */}
       <div className="h-5 w-px opacity-40 bg-secondary" />
 
       {/* Arabic version */}
       <span
-        className="font-arabic text-4xl text-secondary"
+        className="font-arabic text-secondary"
         style={{
           direction: "rtl",
+          fontSize: "var(--text-display-sm)",
         }}
       >
         {arabicDate}

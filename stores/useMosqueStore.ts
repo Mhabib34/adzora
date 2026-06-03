@@ -24,6 +24,7 @@ const defaultConfig: MosqueConfig = {
   longitude: 106.8456,
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   isSetupComplete: false,
+  hijriOffset: 0,
 };
 
 const defaultDisplay: MosqueDisplay = {

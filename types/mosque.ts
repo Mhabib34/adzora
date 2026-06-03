@@ -18,6 +18,8 @@ export interface MosqueConfig {
   timezone: string;
   /** Whether initial setup has been completed */
   isSetupComplete: boolean;
+  /** Hijri date adjustment in days (e.g. -1, 0, 1) */
+  hijriOffset: number;
 }
 
 export interface MosqueTheme {
