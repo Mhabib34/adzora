@@ -12,10 +12,7 @@ import {
   Image as ImageIcon,
   ChevronRight,
   Wifi,
-<<<<<<< HEAD
-=======
   Info,
->>>>>>> bc14fcc (feat: add magic click admin panel)
 } from "lucide-react";
 import { useMosqueStore } from "../../stores/useMosqueStore";
 import { useContentStore } from "../../stores/useContentStore";
@@ -148,8 +145,6 @@ export default function AdminDashboardPage() {
         </Link>
       )}
 
-<<<<<<< HEAD
-=======
       {/* Magic Click Info Banner */}
       <div className="flex items-start gap-3 bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
         <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 mt-0.5">
@@ -165,7 +160,6 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
->>>>>>> bc14fcc (feat: add magic click admin panel)
       {/* Mosque Info Card */}
       <div className="bg-[--color-surface] rounded-2xl p-5 border border-white/5">
         <div className="flex items-start gap-3">

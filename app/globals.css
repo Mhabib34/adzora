@@ -103,24 +103,22 @@
    Untuk route /display — no cursor, no scrollbar
 ======================================== */
 .display-mode {
-<<<<<<< HEAD
-  cursor: none;
-=======
->>>>>>> bc14fcc (feat: add magic click admin panel)
   overflow: hidden;
   user-select: none;
 }
 
-<<<<<<< HEAD
-=======
 body.hide-cursor,
 body.hide-cursor * {
   cursor: none !important;
 }
 
->>>>>>> bc14fcc (feat: add magic click admin panel)
 .display-mode ::-webkit-scrollbar {
   display: none;
+}
+
+/* Hide scrollbar — Firefox */
+.display-mode {
+  scrollbar-width: none;
 }
 
 /* ========================================
@@ -163,44 +161,6 @@ body {
 .font-arabic {
   font-family: var(--font-arabic);
   direction: rtl;
-}
-
-/* ========================================
-   GLOBAL DISPLAY RESET
-======================================== */
-.display-mode {
-<<<<<<< HEAD
-  cursor: none;
-=======
->>>>>>> bc14fcc (feat: add magic click admin panel)
-  overflow: hidden;
-  user-select: none;
-}
-
-/* Hide scrollbar — Webkit */
-.display-mode ::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide scrollbar — Firefox */
-.display-mode {
-  scrollbar-width: none;
-}
-
-/* ========================================
-   FOCUS STYLE — wajib untuk Android TV
-======================================== */
-:focus-visible {
-  outline: 3px solid var(--color-secondary);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* ========================================
-   SAFE ZONE — TV overscan protection
-======================================== */
-.tv-safe-zone {
-  padding: 3vw;
 }
 
 /* ========================================
