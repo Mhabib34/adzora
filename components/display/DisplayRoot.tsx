@@ -43,6 +43,73 @@ const DisplayRootInner = memo(function DisplayRootInner() {
 
   const [isFullScreenPhoto, setIsFullScreenPhoto] = useState(false);
 
+  // Auto-hide cursor on inactivity (3 seconds)
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+
+    const showCursor = () => {
+      document.body.classList.remove("hide-cursor");
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        document.body.classList.add("hide-cursor");
+      }, 3000);
+    };
+
+    // Show cursor initially
+    showCursor();
+
+    window.addEventListener("mousemove", showCursor);
+    window.addEventListener("keydown", showCursor);
+    window.addEventListener("click", showCursor);
+
+    return () => {
+      window.removeEventListener("mousemove", showCursor);
+      window.removeEventListener("keydown", showCursor);
+      window.removeEventListener("click", showCursor);
+      clearTimeout(timeout);
+      document.body.classList.remove("hide-cursor"); // cleanup
+    };
+  }, []);
+
+  // Magic click for pointer devices (5 clicks)
+  const clickCountRef = useRef(0);
+  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMagicClick = () => {
+    clickCountRef.current += 1;
+    if (clickCountRef.current >= 5) {
+      router.push("/admin");
+    }
+    if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
+    clickTimeoutRef.current = setTimeout(() => {
+      clickCountRef.current = 0;
+    }, 2500); // Waktu yang cukup untuk 5 klik
+  };
+
+  // Keyboard shortcut for TV remotes (Enter 3 times fast)
+  useEffect(() => {
+    let enterCount = 0;
+    let lastEnterTime = 0;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        const now = Date.now();
+        if (now - lastEnterTime > 1500) {
+          enterCount = 0;
+        }
+        enterCount++;
+        lastEnterTime = now;
+
+        if (enterCount >= 3) {
+          router.push("/admin");
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [router]);
+
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
 
@@ -159,6 +226,13 @@ const DisplayRootInner = memo(function DisplayRootInner() {
       {/* Overlays */}
       <IqomahCountdown />
       <AdzanOverlay />
+
+      {/* Hidden Magic Button to Open Admin (Bottom Right Corner) */}
+      <div 
+        onClick={handleMagicClick}
+        className="fixed bottom-0 right-0 w-32 h-32 z-[9999] cursor-pointer"
+        title="Secret Admin Menu (Click 5x)"
+      />
     </div>
   );
 });

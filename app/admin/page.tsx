@@ -12,6 +12,10 @@ import {
   Image as ImageIcon,
   ChevronRight,
   Wifi,
+<<<<<<< HEAD
+=======
+  Info,
+>>>>>>> bc14fcc (feat: add magic click admin panel)
 } from "lucide-react";
 import { useMosqueStore } from "../../stores/useMosqueStore";
 import { useContentStore } from "../../stores/useContentStore";
@@ -144,6 +148,24 @@ export default function AdminDashboardPage() {
         </Link>
       )}
 
+<<<<<<< HEAD
+=======
+      {/* Magic Click Info Banner */}
+      <div className="flex items-start gap-3 bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+        <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 mt-0.5">
+          <Info className="w-4 h-4 text-blue-400" />
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-blue-400">
+            Cara masuk ke Admin dari layar Display TV
+          </p>
+          <p className="text-xs text-blue-400/80 mt-1 leading-relaxed">
+            Tekan tombol <strong>OK / Enter 3 kali</strong> secara cepat pada remote TV Anda, atau arahkan mouse ke <strong>pojok kanan bawah layar lalu klik 5 kali</strong>.
+          </p>
+        </div>
+      </div>
+
+>>>>>>> bc14fcc (feat: add magic click admin panel)
       {/* Mosque Info Card */}
       <div className="bg-[--color-surface] rounded-2xl p-5 border border-white/5">
         <div className="flex items-start gap-3">
