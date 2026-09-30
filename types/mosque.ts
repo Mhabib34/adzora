@@ -41,7 +41,7 @@ export type ThemePreset =
   | "ungu-malam"
   | "emas-gelap"
   | "monokrom-elegan"
-  | "custom";
+  | "custom"; 
 
 export interface MosqueDisplay {
   /** Show seconds on digital clock */
