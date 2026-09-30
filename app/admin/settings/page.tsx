@@ -146,315 +146,325 @@ export default function SettingsPage() {
   }, [resetConfig, resetCalculationConfig]);
 
   return (
-    <div className="min-h-screen bg-[--color-background] text-white p-6">
-      <div className="max-w-lg mx-auto space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-[--color-primary]">
-            Pengaturan
-          </h1>
-          <p className="text-sm text-white/50 mt-1">
-            Konfigurasi tampilan layar dan opsi data.
-          </p>
-        </div>
+    <div className="space-y-8">
+      {/* Top Header */}
+      <div className="border-b border-white/5 pb-6">
+        <h1 className="text-3xl font-bold font-display text-white tracking-wide">
+          Pengaturan Sistem & Fitur
+        </h1>
+        <p className="text-sm font-sans text-white/60 mt-1">
+          Atur elemen tampilan layar, kecepatan animasi, ganti PIN admin, dan opsi reset data
+        </p>
+      </div>
 
-        {/* Display Toggles */}
-        <Section icon={<Monitor className="w-4 h-4" />} title="Tampilan">
+      {/* Display Toggles */}
+      <Section icon={<Monitor className="w-5 h-5" />} title="Fitur Elemen Tampilan Display">
+        <div className="space-y-2 divide-y divide-white/5">
           <ToggleRow
-            label="Tampilkan Detik"
-            desc="Jam digital menampilkan angka detik"
+            label="Tampilkan Angka Detik"
+            desc="Jam digital utama menampilkan detik di layar"
             value={showSeconds}
             onChange={setShowSeconds}
           />
           <ToggleRow
-            label="Kalender Hijriah"
-            desc="Tampilkan tanggal Hijriah di layar"
+            label="Kalender Penanggalan Hijriah"
+            desc="Tampilkan tanggal Hijriah di samping tanggal Masehi"
             value={showHijri}
             onChange={setShowHijri}
           />
           <ToggleRow
-            label="Running Text"
-            desc="Teks berjalan di bagian bawah layar"
+            label="Running Text Pengumuman"
+            desc="Tampilkan pita teks berjalan di bagian bawah layar"
             value={showRunningText}
             onChange={setShowRunningText}
           />
           <ToggleRow
-            label="Slideshow Foto"
-            desc="Tampilkan slideshow gambar masjid"
+            label="Slideshow Foto Galeri"
+            desc="Tampilkan animasi galeri foto masjid secara periodik"
             value={showSlideshow}
             onChange={setShowSlideshow}
           />
-        </Section>
+        </div>
+      </Section>
 
-        {/* Speed Controls */}
-        <Section icon={<Clock className="w-4 h-4" />} title="Kecepatan">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-white/50 uppercase tracking-wide">
-                  Durasi Slide
-                </label>
-                <span className="text-xs font-mono text-white/50">
-                  {slideDuration} detik
-                </span>
-              </div>
-              <input
-                type="range"
-                min={5}
-                max={60}
-                step={5}
-                value={slideDuration}
-                onChange={(e) => setSlideDuration(parseInt(e.target.value, 10))}
-                className="w-full accent-[--color-primary]"
-              />
-              <div className="flex justify-between text-[10px] text-white/25">
-                <span>5 dtk</span>
-                <span>60 dtk</span>
-              </div>
+      {/* Speed Controls */}
+      <Section icon={<Clock className="w-5 h-5" />} title="Kecepatan Animasi & Slide">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-1">
+          <div className="space-y-3 bg-white/5 p-4 rounded-2xl border border-white/10">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold tracking-widest uppercase text-white/70">
+                Durasi Berganti Slide Foto
+              </label>
+              <span className="text-xs font-mono font-bold text-[--color-secondary] bg-[--color-secondary]/10 border border-[--color-secondary]/20 px-3 py-1 rounded-full">
+                {slideDuration} detik
+              </span>
             </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-white/50 uppercase tracking-wide">
-                  Kecepatan Ticker
-                </label>
-                <span className="text-xs font-mono text-white/50">
-                  {tickerSpeed} px/s
-                </span>
-              </div>
-              <input
-                type="range"
-                min={10}
-                max={100}
-                step={5}
-                value={tickerSpeed}
-                onChange={(e) => setTickerSpeed(parseInt(e.target.value, 10))}
-                className="w-full accent-[--color-primary]"
-              />
-              <div className="flex justify-between text-[10px] text-white/25">
-                <span>Lambat</span>
-                <span>Cepat</span>
-              </div>
+            <input
+              type="range"
+              min={5}
+              max={60}
+              step={5}
+              value={slideDuration}
+              onChange={(e) => setSlideDuration(parseInt(e.target.value, 10))}
+              className="w-full accent-[--color-secondary] h-2 bg-white/10 rounded-lg cursor-pointer"
+            />
+            <div className="flex justify-between text-[11px] font-mono text-white/40">
+              <span>5 Detik</span>
+              <span>60 Detik</span>
             </div>
           </div>
-        </Section>
 
-        {/* Layout */}
-        <Section icon={<Settings className="w-4 h-4" />} title="Layout Display">
-          <div className="space-y-2">
-            {LAYOUT_OPTIONS.map((opt) => (
-              <button
-                key={opt.key}
-                onClick={() => setLayout(opt.key)}
-                className={`w-full text-left rounded-xl px-4 py-3 border transition-colors ${
-                  layout === opt.key
-                    ? "border-[--color-primary]/60 bg-[--color-primary]/20"
-                    : "border-white/8 bg-white/3 hover:border-white/15"
+          <div className="space-y-3 bg-white/5 p-4 rounded-2xl border border-white/10">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold tracking-widest uppercase text-white/70">
+                Kecepatan Running Text
+              </label>
+              <span className="text-xs font-mono font-bold text-[--color-secondary] bg-[--color-secondary]/10 border border-[--color-secondary]/20 px-3 py-1 rounded-full">
+                {tickerSpeed} px/s
+              </span>
+            </div>
+            <input
+              type="range"
+              min={10}
+              max={100}
+              step={5}
+              value={tickerSpeed}
+              onChange={(e) => setTickerSpeed(parseInt(e.target.value, 10))}
+              className="w-full accent-[--color-secondary] h-2 bg-white/10 rounded-lg cursor-pointer"
+            />
+            <div className="flex justify-between text-[11px] font-mono text-white/40">
+              <span>Perlahan</span>
+              <span>Sangat Cepat</span>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      {/* Layout */}
+      <Section icon={<Settings className="w-5 h-5" />} title="Pilihan Tata Letak Layout">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+          {LAYOUT_OPTIONS.map((opt) => (
+            <button
+              key={opt.key}
+              onClick={() => setLayout(opt.key)}
+              className={`text-left rounded-2xl p-4 border transition-all duration-300 ${
+                layout === opt.key
+                  ? "border-[--color-secondary]/60 bg-[--color-primary]/30 text-white shadow-xl shadow-[--color-primary]/10"
+                  : "border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/20 text-white/60"
+              }`}
+            >
+              <p
+                className={`text-sm font-bold font-display ${
+                  layout === opt.key ? "text-[--color-secondary]" : "text-white"
                 }`}
               >
-                <p
-                  className={`text-sm font-semibold ${layout === opt.key ? "text-[--color-secondary]" : "text-white"}`}
-                >
-                  {opt.label}
-                </p>
-                <p className="text-xs text-white/40 mt-0.5">{opt.desc}</p>
-              </button>
-            ))}
+                {opt.label}
+              </p>
+              <p className="text-xs font-sans text-white/40 mt-1">{opt.desc}</p>
+            </button>
+          ))}
+        </div>
+      </Section>
+
+      {/* Save button */}
+      <button
+        onClick={handleSave}
+        disabled={saveStatus === "saving" || saveStatus === "saved"}
+        className="w-full flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-[--color-primary] to-[--color-primary]/80 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed transition-all py-4 text-base font-bold font-display text-white shadow-2xl border border-[--color-secondary]/40"
+      >
+        {saveStatus === "saving" && (
+          <Loader2 className="w-5 h-5 animate-spin" />
+        )}
+        {saveStatus === "saved" && <CheckCircle className="w-5 h-5 text-emerald-400" />}
+        {saveStatus === "idle" && <Save className="w-5 h-5" />}
+        {saveStatus === "saving"
+          ? "Menyimpan Pengaturan..."
+          : saveStatus === "saved"
+            ? "Berhasil Tersimpan!"
+            : "Simpan Semua Pengaturan Tampilan"}
+      </button>
+
+      {/* PIN Change */}
+      <div className="bg-[--color-surface]/60 backdrop-blur-2xl rounded-3xl p-6 border border-[--color-secondary]/20 shadow-xl space-y-5">
+        <div className="flex items-center gap-3 border-b border-white/5 pb-3">
+          <div className="w-9 h-9 rounded-xl bg-[--color-secondary]/20 border border-[--color-secondary]/30 flex items-center justify-center text-[--color-secondary]">
+            <KeyRound className="w-5 h-5" />
           </div>
-        </Section>
-
-        {/* Save button */}
-        <button
-          onClick={handleSave}
-          disabled={saveStatus === "saving" || saveStatus === "saved"}
-          className="w-full flex items-center justify-center gap-2 rounded-2xl bg-[--color-primary] hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed transition-opacity py-4 text-base font-bold text-white"
-        >
-          {saveStatus === "saving" && (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          )}
-          {saveStatus === "saved" && <CheckCircle className="w-5 h-5" />}
-          {saveStatus === "idle" && <Save className="w-5 h-5" />}
-          {saveStatus === "saving"
-            ? "Menyimpan..."
-            : saveStatus === "saved"
-              ? "Tersimpan!"
-              : "Simpan Pengaturan"}
-        </button>
-
-        {/* PIN Change */}
-        <div className="bg-[--color-surface] rounded-2xl p-5 border border-white/5 space-y-4">
-          <div className="flex items-center gap-2">
-            <KeyRound className="w-4 h-4 text-[--color-secondary]" />
-            <h2 className="text-sm font-bold text-white/70 uppercase tracking-wider">
-              Ganti PIN Admin
+          <div>
+            <h2 className="text-base font-bold font-display text-white">
+              Ganti PIN Keamanan Admin
             </h2>
+            <p className="text-xs text-white/50">
+              PIN 6 digit digunakan untuk mengunci akses panel konfigurasi admin
+            </p>
           </div>
+        </div>
 
-          <div className="space-y-3">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-white/50 uppercase tracking-wide">
-                PIN Saat Ini
-              </label>
-              <div className="relative">
-                <input
-                  type={showPin ? "text" : "password"}
-                  inputMode="numeric"
-                  maxLength={6}
-                  value={currentPin}
-                  onChange={(e) =>
-                    setCurrentPin(e.target.value.replace(/\D/g, ""))
-                  }
-                  placeholder="••••••"
-                  className="w-full rounded-xl px-4 py-3 pr-10 text-sm bg-white/5 border border-white/10 text-white placeholder-white/20 focus:border-[--color-primary]/60 outline-none transition-colors font-mono tracking-widest"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPin((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
-                >
-                  {showPin ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-white/50 uppercase tracking-wide">
-                PIN Baru (6 digit)
-              </label>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold tracking-widest uppercase text-white/60">
+              PIN Saat Ini
+            </label>
+            <div className="relative">
               <input
                 type={showPin ? "text" : "password"}
                 inputMode="numeric"
                 maxLength={6}
-                value={newPin}
-                onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ""))}
-                placeholder="••••••"
-                className="w-full rounded-xl px-4 py-3 text-sm bg-white/5 border border-white/10 text-white placeholder-white/20 focus:border-[--color-primary]/60 outline-none transition-colors font-mono tracking-widest"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-white/50 uppercase tracking-wide">
-                Konfirmasi PIN Baru
-              </label>
-              <input
-                type={showPin ? "text" : "password"}
-                inputMode="numeric"
-                maxLength={6}
-                value={confirmPin}
+                value={currentPin}
                 onChange={(e) =>
-                  setConfirmPin(e.target.value.replace(/\D/g, ""))
+                  setCurrentPin(e.target.value.replace(/\D/g, ""))
                 }
                 placeholder="••••••"
-                className="w-full rounded-xl px-4 py-3 text-sm bg-white/5 border border-white/10 text-white placeholder-white/20 focus:border-[--color-primary]/60 outline-none transition-colors font-mono tracking-widest"
+                className="w-full rounded-2xl px-4 py-3.5 pr-10 text-sm bg-white/5 border border-white/10 text-white placeholder-white/20 focus:border-[--color-secondary]/60 outline-none transition-all font-mono tracking-widest text-center"
               />
+              <button
+                type="button"
+                onClick={() => setShowPin((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70"
+              >
+                {showPin ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
             </div>
+          </div>
 
-            {pinError && <p className="text-xs text-red-400">{pinError}</p>}
-            {pinSuccess && (
-              <p className="text-xs text-emerald-400">PIN berhasil diubah!</p>
-            )}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold tracking-widest uppercase text-white/60">
+              PIN Baru (6 Digit)
+            </label>
+            <input
+              type={showPin ? "text" : "password"}
+              inputMode="numeric"
+              maxLength={6}
+              value={newPin}
+              onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ""))}
+              placeholder="••••••"
+              className="w-full rounded-2xl px-4 py-3.5 text-sm bg-white/5 border border-white/10 text-white placeholder-white/20 focus:border-[--color-secondary]/60 outline-none transition-all font-mono tracking-widest text-center"
+            />
+          </div>
 
-            <button
-              onClick={handleChangePin}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-[--color-primary]/20 hover:bg-[--color-primary]/30 border border-[--color-primary]/30 transition-colors py-3 text-sm font-semibold text-[--color-secondary]"
-            >
-              <KeyRound className="w-4 h-4" />
-              Simpan PIN Baru
-            </button>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold tracking-widest uppercase text-white/60">
+              Konfirmasi PIN Baru
+            </label>
+            <input
+              type={showPin ? "text" : "password"}
+              inputMode="numeric"
+              maxLength={6}
+              value={confirmPin}
+              onChange={(e) =>
+                setConfirmPin(e.target.value.replace(/\D/g, ""))
+              }
+              placeholder="••••••"
+              className="w-full rounded-2xl px-4 py-3.5 text-sm bg-white/5 border border-white/10 text-white placeholder-white/20 focus:border-[--color-secondary]/60 outline-none transition-all font-mono tracking-widest text-center"
+            />
           </div>
         </div>
 
-        {/* Danger Zone */}
-        <div className="bg-[--color-surface] rounded-2xl p-5 border border-red-500/15 space-y-4">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-red-400" />
-            <h2 className="text-sm font-bold text-red-400/80 uppercase tracking-wider">
-              Zona Berbahaya
+        {pinError && <p className="text-xs font-semibold text-red-400">{pinError}</p>}
+        {pinSuccess && (
+          <p className="text-xs font-semibold text-emerald-400">PIN Keamanan Berhasil Diperbarui!</p>
+        )}
+
+        <button
+          onClick={handleChangePin}
+          className="w-full flex items-center justify-center gap-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all py-3.5 text-sm font-bold font-display text-[--color-secondary]"
+        >
+          <KeyRound className="w-4 h-4" />
+          Simpan Perubahan PIN Baru
+        </button>
+      </div>
+
+      {/* Danger Zone */}
+      <div className="bg-red-500/5 backdrop-blur-2xl rounded-3xl p-6 border border-red-500/20 shadow-xl space-y-4">
+        <div className="flex items-center gap-3 border-b border-red-500/20 pb-3">
+          <div className="w-9 h-9 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
+            <AlertTriangle className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-base font-bold font-display text-red-400">
+              Zona Bahaya & Reset Data
             </h2>
-          </div>
-
-          {/* Reset prayer */}
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-white/70">
-                Reset Konfigurasi Sholat
-              </p>
-              <p className="text-xs text-white/35 mt-0.5">
-                Kembalikan metode kalkulasi, offset, dan iqomah ke default.
-              </p>
-            </div>
-            {resetConfirm === "prayer" ? (
-              <div className="flex gap-1.5 shrink-0">
-                <button
-                  onClick={handleResetPrayer}
-                  className="text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg px-3 py-1.5 font-semibold transition-colors"
-                >
-                  Ya
-                </button>
-                <button
-                  onClick={() => setResetConfirm("none")}
-                  className="text-xs bg-white/5 text-white/40 rounded-lg px-3 py-1.5 transition-colors"
-                >
-                  Batal
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setResetConfirm("prayer")}
-                className="flex items-center gap-1.5 text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg px-3 py-1.5 font-semibold transition-colors shrink-0"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-                Reset
-              </button>
-            )}
-          </div>
-
-          <div className="border-t border-white/5" />
-
-          {/* Reset all */}
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-white/70">
-                Reset Semua Data
-              </p>
-              <p className="text-xs text-white/35 mt-0.5">
-                Hapus semua konfigurasi masjid dan kembali ke awal.
-              </p>
-            </div>
-            {resetConfirm === "all" ? (
-              <div className="flex gap-1.5 shrink-0">
-                <button
-                  onClick={handleResetAll}
-                  className="text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg px-3 py-1.5 font-semibold transition-colors"
-                >
-                  Ya, Hapus
-                </button>
-                <button
-                  onClick={() => setResetConfirm("none")}
-                  className="text-xs bg-white/5 text-white/40 rounded-lg px-3 py-1.5 transition-colors"
-                >
-                  Batal
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setResetConfirm("all")}
-                className="flex items-center gap-1.5 text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg px-3 py-1.5 font-semibold transition-colors shrink-0"
-              >
-                <AlertTriangle className="w-3.5 h-3.5" />
-                Reset
-              </button>
-            )}
+            <p className="text-xs text-red-400/60">
+              Tindakan ini tidak dapat dibatalkan kembali
+            </p>
           </div>
         </div>
 
-        <p className="text-center text-xs text-white/20 pb-4">
-          Adzora v1.0 — Semua data tersimpan lokal di perangkat ini.
-        </p>
+        {/* Reset prayer */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-2xl bg-white/5 border border-white/5">
+          <div>
+            <p className="text-sm font-bold font-display text-white">
+              Reset Konfigurasi Jadwal Sholat
+            </p>
+            <p className="text-xs text-white/50 mt-0.5">
+              Mengembalikan metode hitung, offset menit, dan durasi iqomah ke nilai awal pabrik
+            </p>
+          </div>
+          {resetConfirm === "prayer" ? (
+            <div className="flex gap-2 shrink-0">
+              <button
+                onClick={handleResetPrayer}
+                className="text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/40 rounded-xl px-4 py-2 font-semibold transition-all"
+              >
+                Ya, Reset
+              </button>
+              <button
+                onClick={() => setResetConfirm("none")}
+                className="text-xs bg-white/5 text-white/50 border border-white/10 rounded-xl px-4 py-2 transition-all"
+              >
+                Batal
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setResetConfirm("prayer")}
+              className="flex items-center gap-2 text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl px-4 py-2 font-semibold transition-all shrink-0"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Reset Jadwal
+            </button>
+          )}
+        </div>
+
+        {/* Reset all */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-2xl bg-white/5 border border-white/5">
+          <div>
+            <p className="text-sm font-bold font-display text-white">
+              Reset Seluruh Sistem & Data Masjid
+            </p>
+            <p className="text-xs text-white/50 mt-0.5">
+              Menghapus semua profil masjid, koordinat, running text, media, dan pengaturan tampilan
+            </p>
+          </div>
+          {resetConfirm === "all" ? (
+            <div className="flex gap-2 shrink-0">
+              <button
+                onClick={handleResetAll}
+                className="text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/40 rounded-xl px-4 py-2 font-semibold transition-all"
+              >
+                Ya, Hapus Semua
+              </button>
+              <button
+                onClick={() => setResetConfirm("none")}
+                className="text-xs bg-white/5 text-white/50 border border-white/10 rounded-xl px-4 py-2 transition-all"
+              >
+                Batal
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setResetConfirm("all")}
+              className="flex items-center gap-2 text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl px-4 py-2 font-semibold transition-all shrink-0"
+            >
+              <AlertTriangle className="w-4 h-4" />
+              Reset Total
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -474,10 +484,12 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-[--color-surface] rounded-2xl p-5 border border-white/5 space-y-4">
-      <div className="flex items-center gap-2">
-        <span className="text-[--color-secondary]">{icon}</span>
-        <h2 className="text-sm font-bold text-white/70 uppercase tracking-wider">
+    <div className="bg-[--color-surface]/60 backdrop-blur-2xl rounded-3xl p-6 border border-[--color-secondary]/20 shadow-xl space-y-4">
+      <div className="flex items-center gap-3 border-b border-white/5 pb-3">
+        <div className="w-9 h-9 rounded-xl bg-[--color-secondary]/20 border border-[--color-secondary]/30 flex items-center justify-center text-[--color-secondary]">
+          {icon}
+        </div>
+        <h2 className="text-base font-bold font-display text-white">
           {title}
         </h2>
       </div>
@@ -496,17 +508,17 @@ interface ToggleRowProps {
 /** Row with label, description, and toggle button */
 function ToggleRow({ label, desc, value, onChange }: ToggleRowProps) {
   return (
-    <div className="flex items-center justify-between gap-3 py-1">
+    <div className="flex items-center justify-between gap-4 py-3">
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-white/80">{label}</p>
-        <p className="text-xs text-white/35 mt-0.5">{desc}</p>
+        <p className="text-sm font-bold font-display text-white">{label}</p>
+        <p className="text-xs font-sans text-white/50 mt-0.5">{desc}</p>
       </div>
       <button
         onClick={() => onChange(!value)}
-        className={`flex items-center gap-1.5 text-xs rounded-xl px-3 py-2 font-semibold transition-colors shrink-0 ${
+        className={`flex items-center gap-2 text-xs rounded-full px-4 py-2 font-semibold transition-all border shrink-0 ${
           value
-            ? "bg-emerald-500/15 text-emerald-400"
-            : "bg-white/5 text-white/35"
+            ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40 shadow-md shadow-emerald-500/10"
+            : "bg-white/5 text-white/40 border-white/10"
         }`}
       >
         {value ? (

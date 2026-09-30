@@ -7,32 +7,33 @@ import { useMosqueStore } from "../../stores/useMosqueStore";
 import { useAdminStore } from "../../stores/useAdminStore";
 import { useRouter } from "next/navigation";
 import { DigitalClock } from "./DigitalClock";
+import { HijriCalendar } from "./HijriCalendar";
 import { PrayerSchedule } from "./PrayerSchedule";
 import { IqomahCountdown } from "./IqomahCountdown";
-import { HijriCalendar } from "./HijriCalendar";
 import { RunningText } from "./RunningText";
 import { Slideshow } from "./Slideshow";
 import { AdzanOverlay } from "./AdzanOverlay";
 import { useDisplayStore } from "../../stores/useDisplayStore";
 import { DisplayErrorBoundary } from "./DisplayErrorBoundary";
-import { GeometricBackground } from "./GeometricBackground";
-import { QuranPanel } from "./QuranPanel";
-import { EventCard } from "./EventCard";
+import { RotatingBackground } from "./RotatingBackground";
+import { QuranOverlay } from "./QuranOverlay";
 // ─── Main component ───────────────────────────────────────────────────────────
 
 /**
- * DisplayRootInner uses a strict 3-row layout:
+ * DisplayRootInner uses a clean layout:
  *
- *  Row A (fixed ~30%): Clock+Date+Hijri | Slideshow
- *  Row B (fixed ~58%): PrayerSchedule  | QuranPanel + EventCard
- *  Row C (fixed ~8%):  RunningText (full width)
- *
- * All heights are expressed in vh so they never overflow.
+ *  Row Top (fixed, rapat ke atas/kiri/kanan, bg putih gradient solid):
+ *                                    Adzora (kiri) | Nama Masjid (tengah) | DigitalClock (kanan)
+ *  Main Center Content:              Slideshow / Media Area
+ *  Row B:                           PrayerSchedule
+ *  Row C (fixed, nempel bawah):     RunningText (full width)
+ *  Overlays:                        QuranOverlay (15s tiap 5 mnt), IqomahCountdown, AdzanOverlay
  */
 const DisplayRootInner = memo(function DisplayRootInner() {
   const engineRef = useRef<ScheduleEngine | null>(null);
   const applyCSSVars = useThemeStore((s) => s.applyCSSVariables);
   const display = useMosqueStore((s) => s.display);
+  const mosqueName = useMosqueStore((s) => s.config.name);
   const isSetupComplete = useMosqueStore((s) => s.config.isSetupComplete);
   const hasSetPin = useAdminStore((s) => s.hasSetPin);
   const hasHydrated = useAdminStore((s) => s._hasHydrated);
@@ -42,6 +43,7 @@ const DisplayRootInner = memo(function DisplayRootInner() {
   const isIqomahActive = useDisplayStore((s) => s.isIqomahActive);
 
   const [isFullScreenPhoto, setIsFullScreenPhoto] = useState(false);
+  const [isQuranOverlayActive, setIsQuranOverlayActive] = useState(false);
 
   // Auto-hide cursor on inactivity (3 seconds)
   useEffect(() => {
@@ -110,17 +112,43 @@ const DisplayRootInner = memo(function DisplayRootInner() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [router]);
 
+  // Full Screen Photo Timer (Setiap 5 menit, diselang-seling 2.5 menit setelah Quran Overlay)
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    // Start with a 2.5 minute offset delay so it alternates nicely with Quran Overlay
+    const startTimeout = setTimeout(() => {
+      const cycle = () => {
+        setIsFullScreenPhoto(true);
+        timeoutId = setTimeout(() => {
+          setIsFullScreenPhoto(false);
+          timeoutId = setTimeout(() => {
+            cycle();
+          }, 300000); // 5 menit jeda
+        }, 90000); // 90 detik full screen
+      };
+
+      cycle();
+    }, 150000); // 2.5 menit initial offset delay
+
+    return () => {
+      clearTimeout(startTimeout);
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
+  // Periodic Full-Screen Quran Overlay Timer (Setiap 5 menit tampil 15 detik)
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
 
     const cycle = () => {
-      setIsFullScreenPhoto(false);
+      setIsQuranOverlayActive(false);
       timeoutId = setTimeout(() => {
-        setIsFullScreenPhoto(true);
+        setIsQuranOverlayActive(true);
         timeoutId = setTimeout(() => {
           cycle();
-        }, 60000); // 1 menit full screen
-      }, 300000); // 5 menit normal
+        }, 15000); // 15 detik tampil full screen
+      }, 300000); // 5 menit jeda
     };
 
     cycle();
@@ -159,7 +187,7 @@ const DisplayRootInner = memo(function DisplayRootInner() {
     const engine = new ScheduleEngine();
     engineRef.current = engine;
     void engine.init();
-    
+
     return () => {
       engine.destroy();
       engineRef.current = null;
@@ -176,61 +204,78 @@ const DisplayRootInner = memo(function DisplayRootInner() {
     );
   }
 
-  return (
-    <div className="flex flex-col h-full overflow-hidden bg-background text-white px-4 gap-6 box-border relative">
-      <GeometricBackground />
+  const isMinimalis = display.layout === "minimalis";
+  const isPenuh = display.layout === "penuh";
 
-      <div className="flex flex-row flex-1 min-h-0 gap-4 z-10 w-full">
-        {/* ── Left Column ── */}
-        <div className="flex flex-col gap-4 w-1/2 min-h-0">
-          {/* Clock + Hijri */}
-          <div className="flex flex-col justify-center shrink-0">
+  return (
+    <div 
+      className="flex flex-col h-full overflow-hidden bg-transparent text-white px-4 gap-6 box-border relative"
+      style={isPenuh ? { zoom: 1.15 } as React.CSSProperties : undefined}
+    >
+      <RotatingBackground />
+
+      {/* ── ROW TOP: satu card putih gradient, rapat ke atas/kiri/kanan, tanpa padding luar ── */}
+      <div className="fixed top-0 left-0 right-0 z-20">
+        <div
+          className="w-full flex flex-row items-center justify-between px-8 py-4"
+          style={{
+            background:
+              "linear-gradient(135deg, #F5F5F5 0%, color-mix(in srgb, var(--color-primary) 50%, white) 100%)",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.2)",
+          }}
+        >
+          {/* Kiri: nama app */}
+          <div className="shrink-0">
+            <span className="text-5xl font-bold tracking-widest uppercase text-slate-500 font-display">
+              Adzora
+            </span>
+          </div>
+
+          {/* Tengah: nama masjid */}
+          <div className="flex-1 flex items-center justify-center px-8 min-w-0">
+            <span className="text-5xl font-bold uppercase tracking-wide text-slate-900 text-center truncate font-display">
+              {mosqueName}
+            </span>
+          </div>
+
+          {/* Kanan: digital clock & hijri calendar */}
+          <div className="shrink-0 flex flex-col items-end gap-1">
             <DigitalClock />
             {display.showHijriCalendar && <HijriCalendar />}
-          </div>
-
-          {/* Prayer schedule */}
-          <div className="flex-1 min-h-0">
-            <PrayerSchedule />
-          </div>
-        </div>
-
-        {/* ── Right Column ── */}
-        <div className="flex flex-col gap-4 w-1/2 min-h-0">
-          {display.showSlideshow && (
-            <div className="flex-1 min-h-0 rounded-2xl overflow-hidden relative">
-              <Slideshow />
-            </div>
-          )}
-          <div className="shrink-0 flex flex-col gap-4">
-            <QuranPanel />
-            <EventCard />
           </div>
         </div>
       </div>
 
-      {/* ── ROW C: Running text ── */}
-      {display.showRunningText && (
-        <div className="shrink-0 z-10 w-full">
+      <div className="flex flex-col flex-1 min-h-0 gap-4 z-10 w-full justify-end pt-32 pb-20">
+        {/* ── Middle row: Horizontal Prayer Schedule ── */}
+        <div className="shrink-0 w-full">
+          <PrayerSchedule />
+        </div>
+      </div>
+
+      {/* ── ROW C: Running text — fixed nempel di bawah layar ── */}
+      {display.showRunningText && !isMinimalis && (
+        <div className="fixed bottom-0 left-0 right-0 z-20">
           <RunningText />
         </div>
       )}
 
       {/* Full Screen Photo Overlay (setiap 5 menit tampil 1 menit) */}
-      {isFullScreenPhoto && display.showSlideshow && !isAdzanPlaying && !isIqomahActive && (
+      {isFullScreenPhoto && display.showSlideshow && !isMinimalis && !isAdzanPlaying && !isIqomahActive && !isQuranOverlayActive && (
         <div className="fixed inset-0 z-40 bg-black">
           <Slideshow />
         </div>
       )}
 
       {/* Overlays */}
+      <QuranOverlay isActive={isQuranOverlayActive && !isAdzanPlaying && !isIqomahActive} />
       <IqomahCountdown />
       <AdzanOverlay />
 
       {/* Hidden Magic Button to Open Admin (Bottom Right Corner) */}
-      <div 
+      <div
         onClick={handleMagicClick}
-        className="fixed bottom-0 right-0 w-32 h-32 z-[9999] cursor-pointer"
+        className="fixed bottom-0 right-0 w-32 h-32 z-9999 cursor-pointer"
         title="Secret Admin Menu (Click 5x)"
       />
     </div>

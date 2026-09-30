@@ -40,6 +40,12 @@ export const THEME_PRESETS: Record<ThemePreset, Omit<MosqueTheme, "preset">> = {
     colorBackground: "#1a1408",
     colorSurface: "#261e0c",
   },
+  "monokrom-elegan": {
+    colorPrimary: "#ffffff",
+    colorSecondary: "#94a3b8",
+    colorBackground: "#050505",
+    colorSurface: "#141414",
+  },
   custom: {
     colorPrimary: "#1a6b3c",
     colorSecondary: "#d4a017",

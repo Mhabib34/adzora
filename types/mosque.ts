@@ -40,6 +40,7 @@ export type ThemePreset =
   | "biru-langit"
   | "ungu-malam"
   | "emas-gelap"
+  | "monokrom-elegan"
   | "custom";
 
 export interface MosqueDisplay {

@@ -11,7 +11,6 @@ import {
   Radio,
   Image as ImageIcon,
   ChevronRight,
-  Wifi,
   Info,
 } from "lucide-react";
 import { useMosqueStore } from "../../stores/useMosqueStore";
@@ -106,20 +105,26 @@ export default function AdminDashboardPage() {
   const setupComplete = config.isSetupComplete;
 
   return (
-    <div className="min-h-screen bg-[--color-background] text-white p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between">
+    <div className="space-y-8">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/5 pb-6">
         <div>
-          <h1 className="text-2xl font-bold text-[--color-primary]">
-            Dashboard
-          </h1>
-          <p className="text-sm text-white/50 mt-0.5">
-            Panel kontrol Adzora Digital Signage
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold font-display text-white tracking-wide">
+              Dashboard Overview
+            </h1>
+            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              Sistem Aktif
+            </span>
+          </div>
+          <p className="text-sm font-sans text-white/60 mt-1">
+            Pusat kendali dan status sistem digital signage masjid Adzora
           </p>
         </div>
-        <div className="flex items-center gap-2 text-sm bg-white/5 rounded-lg px-3 py-2">
-          <Clock className="w-4 h-4 text-[--color-secondary]" />
-          <span className="font-mono font-semibold text-[--color-secondary]">
+        <div className="flex items-center gap-3 bg-[--color-surface]/60 backdrop-blur-xl border border-[--color-secondary]/25 rounded-2xl px-5 py-3 shadow-lg">
+          <Clock className="w-5 h-5 text-[--color-secondary]" />
+          <span className="font-mono text-xl font-bold text-white tracking-tight">
             {currentTimeLabel}
           </span>
         </div>
@@ -129,162 +134,172 @@ export default function AdminDashboardPage() {
       {!setupComplete && (
         <Link
           href="/admin/setup"
-          className="flex items-center gap-3 bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 hover:bg-amber-500/15 transition-colors group"
+          className="flex items-center gap-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-5 hover:bg-amber-500/15 transition-all duration-300 group shadow-lg"
         >
-          <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
+          <AlertCircle className="w-6 h-6 text-amber-400 shrink-0" />
           <div className="flex-1">
-            <p className="text-sm font-semibold text-amber-400">
-              Setup belum selesai
+            <p className="text-base font-bold font-display text-amber-400">
+              Konfigurasi Awal Belum Lengkap
             </p>
-            <p className="text-xs text-amber-400/70 mt-0.5">
-              Lengkapi informasi masjid agar jadwal sholat dapat dihitung dengan
-              benar.
+            <p className="text-xs font-sans text-amber-400/80 mt-0.5">
+              Lengkapi informasi lokasi dan zona waktu masjid agar jadwal sholat otomatis terhitung dengan akurat.
             </p>
           </div>
-          <ChevronRight className="w-4 h-4 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
+          <ChevronRight className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform" />
         </Link>
       )}
 
-      {/* Magic Click Info Banner */}
-      <div className="flex items-start gap-3 bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
-        <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 mt-0.5">
-          <Info className="w-4 h-4 text-blue-400" />
+      {/* Info Remote TV Shortcut Banner */}
+      <div className="flex items-start gap-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl p-5 backdrop-blur-md">
+        <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center shrink-0">
+          <Info className="w-5 h-5 text-blue-400" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-blue-400">
-            Cara masuk ke Admin dari layar Display TV
+          <p className="text-base font-bold font-display text-blue-400">
+            Akses Cepat dari Remote TV
           </p>
-          <p className="text-xs text-blue-400/80 mt-1 leading-relaxed">
-            Tekan tombol <strong>OK / Enter 3 kali</strong> secara cepat pada remote TV Anda, atau arahkan mouse ke <strong>pojok kanan bawah layar lalu klik 5 kali</strong>.
+          <p className="text-xs font-sans text-blue-400/80 mt-1 leading-relaxed">
+            Tekan tombol <strong className="text-blue-300">OK / Enter 3 kali cepat</strong> pada remote TV, atau klik mouse <strong className="text-blue-300">5 kali di sudut kanan bawah</strong> layar display untuk langsung masuk ke panel admin ini.
           </p>
         </div>
       </div>
 
-      {/* Mosque Info Card */}
-      <div className="bg-[--color-surface] rounded-2xl p-5 border border-white/5">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[--color-primary]/20 flex items-center justify-center shrink-0">
-            <MapPin className="w-5 h-5 text-[--color-primary]" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h2 className="font-bold text-lg leading-tight truncate">
-              {config.name}
-            </h2>
-            {config.address && (
-              <p className="text-sm text-white/50 mt-0.5 truncate">
-                {config.address}
-                {config.city ? `, ${config.city}` : ""}
-              </p>
-            )}
-            <div className="flex items-center gap-2 mt-2">
-              {setupComplete ? (
-                <span className="flex items-center gap-1 text-xs text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full">
-                  <CheckCircle className="w-3 h-3" />
-                  Setup selesai
-                </span>
-              ) : (
-                <span className="flex items-center gap-1 text-xs text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-full">
-                  <AlertCircle className="w-3 h-3" />
-                  Belum dikonfigurasi
-                </span>
-              )}
-              {config.latitude !== 0 && (
-                <span className="text-xs text-white/30 font-mono">
-                  {config.latitude.toFixed(4)}, {config.longitude.toFixed(4)}
-                </span>
+      {/* Grid Status Utama */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Mosque Info Card */}
+        <div className="bg-[--color-surface]/60 backdrop-blur-2xl rounded-3xl p-6 border border-[--color-secondary]/20 shadow-xl relative overflow-hidden flex flex-col justify-between">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[--color-primary]/40 to-[--color-secondary]/20 flex items-center justify-center shrink-0 border border-[--color-secondary]/30 shadow-md">
+              <MapPin className="w-6 h-6 text-[--color-secondary]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <span className="text-[10px] font-bold tracking-widest uppercase text-[--color-secondary]">
+                Informasi Masjid
+              </span>
+              <h2 className="font-bold font-display text-xl leading-tight truncate text-white mt-0.5">
+                {config.name}
+              </h2>
+              {config.address && (
+                <p className="text-xs font-sans text-white/60 mt-1 truncate">
+                  {config.address}
+                  {config.city ? `, ${config.city}` : ""}
+                </p>
               )}
             </div>
           </div>
+
+          <div className="flex flex-wrap items-center gap-3 mt-6 pt-4 border-t border-white/5">
+            {setupComplete ? (
+              <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-400/10 px-3 py-1 rounded-full border border-emerald-400/20">
+                <CheckCircle className="w-3.5 h-3.5" />
+                Setup Siap
+              </span>
+            ) : (
+              <span className="flex items-center gap-1.5 text-xs font-semibold text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">
+                <AlertCircle className="w-3.5 h-3.5" />
+                Belum Dikunci
+              </span>
+            )}
+            {config.latitude !== 0 && (
+              <span className="text-xs font-mono text-white/40 bg-white/5 px-3 py-1 rounded-full border border-white/5">
+                GPS: {config.latitude.toFixed(4)}, {config.longitude.toFixed(4)}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Next Prayer Card */}
+        <div className="bg-gradient-to-br from-[--color-primary]/30 via-[--color-surface]/60 to-[--color-background] backdrop-blur-2xl rounded-3xl p-6 border border-[--color-secondary]/30 shadow-xl relative overflow-hidden flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold tracking-widest uppercase text-[--color-secondary]">
+                Jadwal Sholat Berikutnya
+              </span>
+              <Radio className="w-4 h-4 text-[--color-secondary] animate-pulse" />
+            </div>
+            <p className="text-3xl font-extrabold font-display text-[--color-secondary] mt-2 tracking-wide">
+              {nextPrayerLabel}
+            </p>
+            {timeRemainingLabel && (
+              <p className="text-sm font-sans font-medium text-white/70 mt-1">
+                {timeRemainingLabel}
+              </p>
+            )}
+          </div>
+
+          <div className="mt-4">
+            {nextPrayer?.status === "adzan" && (
+              <span className="inline-flex items-center gap-2 text-xs font-bold text-[--color-secondary] bg-[--color-secondary]/20 border border-[--color-secondary]/40 px-3.5 py-1.5 rounded-full animate-pulse shadow-md">
+                <Radio className="w-3.5 h-3.5" />
+                Waktu Adzan Berlangsung
+              </span>
+            )}
+            {nextPrayer?.status === "iqomah" && (
+              <span className="inline-flex items-center gap-2 text-xs font-bold text-emerald-400 bg-emerald-400/20 border border-emerald-400/40 px-3.5 py-1.5 rounded-full animate-pulse shadow-md">
+                <Radio className="w-3.5 h-3.5" />
+                Waktu Iqomah Berlangsung
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Next Prayer Card */}
-      <div className="bg-linear-to-br from-[--color-primary]/30 to-[--color-primary]/10 rounded-2xl p-5 border border-[--color-primary]/20">
-        <p className="text-xs text-white/50 uppercase tracking-widest font-semibold mb-1">
-          Waktu Sholat Berikutnya
-        </p>
-        <p className="text-2xl font-bold text-[--color-secondary]">
-          {nextPrayerLabel}
-        </p>
-        {timeRemainingLabel && (
-          <p className="text-sm text-white/60 mt-1">{timeRemainingLabel}</p>
-        )}
-        {nextPrayer?.status === "adzan" && (
-          <span className="inline-flex items-center gap-1 mt-2 text-xs text-[--color-secondary] bg-[--color-secondary]/10 px-2 py-0.5 rounded-full animate-pulse">
-            <Radio className="w-3 h-3" />
-            Adzan berlangsung
-          </span>
-        )}
-        {nextPrayer?.status === "iqomah" && (
-          <span className="inline-flex items-center gap-1 mt-2 text-xs text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full animate-pulse">
-            <Radio className="w-3 h-3" />
-            Iqomah berlangsung
-          </span>
-        )}
-      </div>
-
       {/* Stats Row */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <StatCard
-          icon={<Radio className="w-5 h-5 text-[--color-secondary]" />}
+          icon={<Radio className="w-6 h-6 text-[--color-secondary]" />}
           label="Running Text Aktif"
           value={String(activeTextsCount)}
-          sub={`dari ${runningTexts.length} total`}
+          sub={`dari total ${runningTexts.length} pengumuman`}
           href="/admin/content"
         />
         <StatCard
-          icon={<ImageIcon className="w-5 h-5 text-[--color-secondary]" />}
-          label="Jadwal Hari Ini"
+          icon={<ImageIcon className="w-6 h-6 text-[--color-secondary]" />}
+          label="Waktu Sholat Hari Ini"
           value={String(todayPrayersCount)}
-          sub="waktu sholat terhitung"
+          sub="terkalkulasi otomatis sesuai koordinat"
           href="/admin/prayer"
         />
       </div>
 
       {/* Quick Actions */}
-      <div>
-        <h3 className="text-xs text-white/40 uppercase tracking-widest font-semibold mb-3">
-          Aksi Cepat
+      <div className="space-y-4 pt-2">
+        <h3 className="text-xs font-bold tracking-widest uppercase text-white/40">
+          Menu Navigasi Cepat
         </h3>
-        <div className="space-y-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <QuickAction
             href="/display"
             icon={<Monitor className="w-5 h-5" />}
-            label="Buka Tampilan Masjid"
-            desc="Tampilkan di TV / layar masjid"
+            label="Buka Tampilan TV"
+            desc="Tampilkan layar utama digital signage masjid"
             accent
           />
           <QuickAction
             href="/admin/setup"
             icon={<MapPin className="w-5 h-5" />}
-            label="Setup Masjid"
-            desc="Nama, lokasi, dan koordinat"
+            label="Setup Profil Masjid"
+            desc="Nama, alamat, & koordinat GPS"
           />
           <QuickAction
             href="/admin/prayer"
             icon={<Clock className="w-5 h-5" />}
-            label="Konfigurasi Jadwal Sholat"
-            desc="Metode kalkulasi, offset, iqomah"
+            label="Jadwal & Iqomah"
+            desc="Atur metode hitung & pewaktu iqomah"
           />
           <QuickAction
             href="/admin/content"
             icon={<Radio className="w-5 h-5" />}
             label="Kelola Running Text"
-            desc="Tambah, edit, dan urutkan teks berjalan"
+            desc="Tambah & urutkan pengumuman berjalan"
           />
           <QuickAction
             href="/admin/media"
             icon={<ImageIcon className="w-5 h-5" />}
-            label="Upload Media"
-            desc="Foto slideshow dan audio adzan"
+            label="Upload Galeri & Audio"
+            desc="Foto slideshow & file adzan MP3"
           />
         </div>
-      </div>
-
-      {/* Footer status */}
-      <div className="flex items-center justify-center gap-2 text-xs text-white/20 pt-2">
-        <Wifi className="w-3 h-3" />
-        <span>Adzora v1.0 — Digital Signage Masjid</span>
       </div>
     </div>
   );
@@ -307,19 +322,19 @@ function StatCard({ icon, label, value, sub, href }: StatCardProps) {
   return (
     <Link
       href={href}
-      className="bg-[--color-surface] rounded-2xl p-4 border border-white/5 hover:border-[--color-primary]/30 transition-colors group"
+      className="bg-[--color-surface]/60 backdrop-blur-2xl rounded-3xl p-6 border border-[--color-secondary]/20 hover:border-[--color-secondary]/40 transition-all duration-300 group shadow-xl hover:-translate-y-1"
     >
-      <div className="flex items-center justify-between mb-3">
-        <div className="w-9 h-9 rounded-lg bg-[--color-secondary]/10 flex items-center justify-center">
+      <div className="flex items-center justify-between mb-4">
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[--color-secondary]/20 to-[--color-primary]/20 border border-[--color-secondary]/30 flex items-center justify-center shadow-md">
           {icon}
         </div>
-        <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/40 group-hover:translate-x-0.5 transition-all" />
+        <ChevronRight className="w-5 h-5 text-white/30 group-hover:text-[--color-secondary] group-hover:translate-x-1 transition-all" />
       </div>
-      <p className="text-2xl font-bold">{value}</p>
-      <p className="text-xs font-semibold text-white/60 mt-0.5 leading-tight">
+      <p className="text-3xl font-bold font-mono text-white tracking-tight">{value}</p>
+      <p className="text-sm font-bold font-display text-[--color-secondary] mt-1 leading-tight">
         {label}
       </p>
-      <p className="text-xs text-white/30 mt-0.5">{sub}</p>
+      <p className="text-xs font-sans text-white/40 mt-1">{sub}</p>
     </Link>
   );
 }
@@ -337,34 +352,34 @@ function QuickAction({ href, icon, label, desc, accent }: QuickActionProps) {
   return (
     <Link
       href={href}
-      className={`flex items-center gap-4 rounded-xl px-4 py-3 border transition-colors group ${
+      className={`flex items-center gap-4 rounded-2xl p-4 border transition-all duration-300 group shadow-lg hover:-translate-y-0.5 ${
         accent
-          ? "bg-[--color-primary]/20 border-[--color-primary]/30 hover:bg-[--color-primary]/30"
-          : "bg-[--color-surface] border-white/5 hover:border-white/10"
+          ? "bg-gradient-to-r from-[--color-primary]/30 via-[--color-primary]/20 to-[--color-surface]/60 border-[--color-secondary]/40 hover:border-[--color-secondary]/60"
+          : "bg-[--color-surface]/50 backdrop-blur-xl border-white/5 hover:border-[--color-secondary]/30 hover:bg-white/5"
       }`}
     >
       <div
-        className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+        className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border transition-colors ${
           accent
-            ? "bg-[--color-primary]/30 text-[--color-secondary]"
-            : "bg-white/5 text-white/60"
+            ? "bg-[--color-secondary]/20 border-[--color-secondary]/40 text-[--color-secondary]"
+            : "bg-white/5 border-white/10 text-white/70 group-hover:text-[--color-secondary] group-hover:border-[--color-secondary]/30"
         }`}
       >
         {icon}
       </div>
       <div className="flex-1 min-w-0">
         <p
-          className={`text-sm font-semibold leading-tight ${
-            accent ? "text-[--color-secondary]" : "text-white"
+          className={`text-sm font-bold font-display leading-tight ${
+            accent ? "text-[--color-secondary]" : "text-white group-hover:text-[--color-secondary] transition-colors"
           }`}
         >
           {label}
         </p>
-        <p className="text-xs text-white/40 mt-0.5 truncate">{desc}</p>
+        <p className="text-xs font-sans text-white/50 mt-0.5 truncate">{desc}</p>
       </div>
       <ChevronRight
-        className={`w-4 h-4 shrink-0 group-hover:translate-x-0.5 transition-transform ${
-          accent ? "text-[--color-secondary]/60" : "text-white/20"
+        className={`w-5 h-5 shrink-0 group-hover:translate-x-1 transition-transform ${
+          accent ? "text-[--color-secondary]" : "text-white/30 group-hover:text-[--color-secondary]"
         }`}
       />
     </Link>

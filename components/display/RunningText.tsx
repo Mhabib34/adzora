@@ -3,7 +3,7 @@
 import { memo } from "react";
 import { useContentStore } from "../../stores/useContentStore";
 import { useMosqueStore } from "../../stores/useMosqueStore";
-import { formatDate } from "../../lib/utils/time";
+import { formatDate, formatDateShort } from "../../lib/utils/time";
 
 export const RunningText = memo(function RunningText() {
   const runningTexts = useContentStore((s) => s.runningTexts);
@@ -15,21 +15,44 @@ export const RunningText = memo(function RunningText() {
 
   if (!activeTexts.length) return null;
 
-  const combined = activeTexts.map((t) => `${formatDate(new Date(t.createdAt))} - ${t.text}`).join("   ✦   ");
+  const combined = activeTexts
+    .map((t) => `${formatDate(new Date(t.createdAt))} - ${t.text}`)
+    .join("   ✦   ");
+
+  const todayStr = formatDateShort(new Date());
 
   return (
-    <div className="overflow-hidden rounded-xl px-0 py-0 flex items-center bg-primary h-16">
-      {/* Label badge */}
-      <div className="shrink-0 flex items-center justify-center px-5 h-full font-bold tracking-widest bg-secondary uppercase text-background min-w-36 text-xl">
-        Info Masjid
+    <div
+      className="overflow-hidden flex items-center h-16 border-t border-[--color-secondary]/30"
+      style={{
+        background:
+          "linear-gradient(135deg, #F8FAFC 0%, color-mix(in srgb, var(--color-primary) 35%, #FFFFFF) 100%)",
+        boxShadow: "0 -4px 20px rgba(0,0,0,0.25)",
+      }}
+    >
+      {/* Label badge — tanggal hari ini (Masehi) */}
+      <div
+        className="shrink-0 flex items-center justify-center px-6 h-full font-display font-bold tracking-wider uppercase text-xl min-w-40"
+        style={{
+          background:
+            "linear-gradient(135deg, var(--color-secondary) 0%, color-mix(in srgb, var(--color-secondary) 75%, black) 100%)",
+          color: "var(--color-background)",
+          textShadow: "0 1px 2px rgba(0,0,0,0.2)",
+        }}
+      >
+        <span className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-[--color-background] animate-pulse" />
+          {todayStr}
+        </span>
       </div>
 
       {/* Scrolling text */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden px-4">
         <div
-          className="whitespace-nowrap text-2xl text-white pl-4 transform font-semibold"
+          className="whitespace-nowrap text-2xl font-sans font-semibold text-slate-900 tracking-wide"
           style={{
-            animation: `ticker-scroll ${tickerSpeed}s linear infinite`,
+            animation: `ticker-scroll ${110 - tickerSpeed}s linear infinite`,
+            fontFeatureSettings: '"cv02", "cv03", "cv04", "cv11"',
           }}
         >
           {combined}

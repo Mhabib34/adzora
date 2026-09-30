@@ -149,83 +149,98 @@ export const PinLock = memo(function PinLock({
   ];
 
   return (
-    <div className="flex min-h-screen w-full flex-col items-center justify-center bg-[--color-background] text-white">
-      {/* Icon */}
-      <div className="mb-6 rounded-full bg-[--color-surface] p-5">
-        <Lock size={40} className="text-[--color-secondary]" />
-      </div>
-
-      {/* Title */}
-      <h1 className="mb-2 text-2xl font-semibold">
-        {!hasSetPin
-          ? setupStep === "enter"
-            ? "Buat PIN Baru"
-            : "Konfirmasi PIN"
-          : "Panel Admin"}
-      </h1>
-      <p className="mb-8 text-sm text-white/50">
-        {!hasSetPin
-          ? setupStep === "enter"
-            ? "Masukkan 6 digit PIN untuk melindungi panel admin"
-            : "Masukkan kembali PIN yang baru Anda buat"
-          : "Masukkan PIN untuk melanjutkan"}
-      </p>
-
-      {/* PIN dots */}
+    <div className="relative flex min-h-screen w-full flex-col items-center justify-center bg-[--color-background] text-white overflow-hidden">
+      {/* Ambient background glow circles */}
       <div
-        className={`mb-8 flex gap-4 ${shake ? "animate-[shake_0.5s_ease-in-out]" : ""}`}
-      >
-        {Array.from({ length: PIN_LENGTH }).map((_, i) => (
-          <div
-            key={i}
-            className={`h-4 w-4 rounded-full border-2 transition-colors ${i < input.length
-                ? error
-                  ? "border-red-500 bg-red-500"
-                  : "border-[--color-secondary] bg-[--color-secondary]"
-                : "border-white/20 bg-transparent"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none opacity-20 blur-3xl"
+        style={{
+          background:
+            "radial-gradient(circle, var(--color-secondary) 0%, var(--color-primary) 50%, transparent 70%)",
+        }}
+      />
+
+      {/* Main Glassmorphic Card */}
+      <div className="z-10 flex flex-col items-center px-10 py-12 rounded-3xl border border-[--color-secondary]/20 bg-[--color-surface]/60 backdrop-blur-2xl shadow-2xl max-w-md w-full mx-4">
+        {/* Icon */}
+        <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-linear-to-br from-[--color-secondary]/20 to-[--color-primary]/20 border border-[--color-secondary]/30 shadow-lg shadow-[--color-secondary]/10">
+          <Lock size={36} className="text-[--color-secondary] drop-shadow-sm" />
+        </div>
+
+        {/* Title */}
+        <h1 className="mb-2 text-2xl font-bold font-display tracking-wide text-white text-center">
+          {!hasSetPin
+            ? setupStep === "enter"
+              ? "Buat PIN Baru"
+              : "Konfirmasi PIN"
+            : "Panel Admin Adzora"}
+        </h1>
+        <p className="mb-8 text-xs font-sans text-white/60 text-center max-w-xs leading-relaxed">
+          {!hasSetPin
+            ? setupStep === "enter"
+              ? "Masukkan 6 digit PIN untuk melindungi akses panel admin"
+              : "Masukkan kembali PIN yang baru saja Anda buat"
+            : "Masukkan 6 digit PIN keamanan untuk mengelola sistem"}
+        </p>
+
+        {/* PIN dots */}
+        <div
+          className={`mb-6 flex gap-4 ${shake ? "animate-[shake_0.5s_ease-in-out]" : ""}`}
+        >
+          {Array.from({ length: PIN_LENGTH }).map((_, i) => (
+            <div
+              key={i}
+              className={`h-4 w-4 rounded-full border-2 transition-all duration-200 ${
+                i < input.length
+                  ? error
+                    ? "border-red-500 bg-red-500 shadow-md shadow-red-500/50 scale-110"
+                    : "border-[--color-secondary] bg-[--color-secondary] shadow-md shadow-[--color-secondary]/50 scale-110"
+                  : "border-white/20 bg-white/5"
               }`}
-          />
-        ))}
-      </div>
+            />
+          ))}
+        </div>
 
-      {/* Error */}
-      <p
-        className={`mb-4 text-sm text-red-400 transition-opacity ${error ? "opacity-100" : "opacity-0"}`}
-      >
-        {!hasSetPin ? "PIN tidak cocok. Ulangi." : "PIN salah. Coba lagi."}
-      </p>
+        {/* Error message */}
+        <div className="h-6 mb-2">
+          <p
+            className={`text-xs font-semibold text-red-400 transition-opacity ${error ? "opacity-100" : "opacity-0"}`}
+          >
+            {!hasSetPin ? "PIN tidak cocok. Ulangi kembali." : "PIN salah. Silakan coba lagi."}
+          </p>
+        </div>
 
-      {/* Numpad */}
-      <div className="grid grid-cols-3 gap-3">
-        {DIGITS.flat().map((digit, i) => {
-          if (digit === "") return <div key={i} />;
-          if (digit === "del") {
+        {/* Numpad */}
+        <div className="grid grid-cols-3 gap-3.5 w-full max-w-[260px]">
+          {DIGITS.flat().map((digit, i) => {
+            if (digit === "") return <div key={i} />;
+            if (digit === "del") {
+              return (
+                <button
+                  key={i}
+                  onClick={handleDelete}
+                  className="flex h-16 w-full items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white/70 transition-all hover:bg-white/10 hover:text-white hover:border-white/20 focus:outline-none active:scale-95 shadow-sm"
+                  aria-label="Hapus digit terakhir"
+                >
+                  <Delete size={22} />
+                </button>
+              );
+            }
             return (
               <button
                 key={i}
-                onClick={handleDelete}
-                className="flex h-16 w-16 items-center justify-center rounded-xl bg-[--color-surface] text-white transition-opacity hover:opacity-70 focus-visible:outline active:scale-95"
-                aria-label="Hapus digit terakhir"
+                onClick={() => handleDigit(digit)}
+                className="flex h-16 w-full items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-xl font-bold font-mono text-white transition-all hover:bg-[--color-primary]/30 hover:border-[--color-secondary]/40 hover:text-[--color-secondary] focus:outline-none active:scale-95 shadow-sm"
               >
-                <Delete size={24} />
+                {digit}
               </button>
             );
-          }
-          return (
-            <button
-              key={i}
-              onClick={() => handleDigit(digit)}
-              className="flex h-16 w-16 items-center justify-center rounded-xl bg-[--color-surface] text-xl font-semibold text-white transition-opacity hover:opacity-70 focus-visible:outline active:scale-95"
-            >
-              {digit}
-            </button>
-          );
-        })}
-      </div>
+          })}
+        </div>
 
-      <p className="mt-8 text-xs text-white/20">
-        Session terkunci otomatis setelah 30 menit tidak aktif
-      </p>
+        <p className="mt-8 text-[11px] font-sans text-white/30 text-center">
+          Sesi otomatis terkunci setelah 30 menit tidak ada aktivitas
+        </p>
+      </div>
     </div>
   );
 });

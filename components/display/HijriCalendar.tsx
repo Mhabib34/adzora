@@ -17,7 +17,7 @@ export const HijriCalendar = memo(function HijriCalendar() {
     <div className="flex gap-3 items-center whitespace-nowrap">
       {/* Latin version */}
       <span
-        className="text-secondary"
+        className="font-display font-bold tracking-wide text-secondary"
         style={{ fontSize: "var(--text-display-sm)" }}
       >
         {formatted.toUpperCase()}
@@ -28,7 +28,7 @@ export const HijriCalendar = memo(function HijriCalendar() {
 
       {/* Arabic version */}
       <span
-        className="font-arabic text-secondary"
+        className="font-cairo font-bold text-secondary"
         style={{
           direction: "rtl",
           fontSize: "var(--text-display-sm)",

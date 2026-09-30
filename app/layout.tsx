@@ -1,18 +1,44 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
-import { Scheherazade_New } from "next/font/google";
+import {
+  Plus_Jakarta_Sans,
+  Outfit,
+  Amiri,
+  Cairo,
+  JetBrains_Mono,
+} from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
+  weight: ["500", "600", "700", "800"],
 });
 
-const scheherazade = Scheherazade_New({
+const amiri = Amiri({
   subsets: ["arabic", "latin"],
   weight: ["400", "700"],
   variable: "--font-arabic",
+  display: "swap",
+});
+
+const cairo = Cairo({
+  subsets: ["arabic", "latin"],
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-cairo",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
   display: "swap",
 });
 
@@ -48,7 +74,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id" className={`${inter.variable} ${scheherazade.variable}`} suppressHydrationWarning>
+    <html
+      lang="id"
+      className={`${plusJakarta.variable} ${outfit.variable} ${amiri.variable} ${cairo.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
       <body>
         <ThemeInit />
         {children}

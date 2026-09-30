@@ -9,12 +9,23 @@ export function EventCard() {
 
   return (
     <div
-      className="flex items-center gap-4 rounded-2xl px-5 py-3 bg-surface"
+      className="flex items-center gap-4 rounded-2xl px-5 py-4"
       style={{
+        background:
+          "linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 30%, transparent) 0%, color-mix(in srgb, var(--color-secondary) 15%, transparent) 100%)",
+        backdropFilter: "blur(18px)",
+        WebkitBackdropFilter: "blur(18px)",
+        boxShadow:
+          "0 4px 24px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.10)",
+        border: "1px solid color-mix(in srgb, var(--color-secondary) 35%, transparent)",
         borderLeft: "3px solid var(--color-secondary)",
       }}
     >
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-primary">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+        style={{
+          background: "color-mix(in srgb, var(--color-secondary) 20%, transparent)",
+        }}
+      >
         <svg
           viewBox="0 0 24 24"
           fill="none"
@@ -34,7 +45,7 @@ export function EventCard() {
         <p className="font-semibold tracking-widest uppercase text-sm text-secondary">
           {eventItem.title || "Info Acara"}
         </p>
-        <p className="mt-0.5 text-white/80 text-lg">{eventItem.description}</p>
+        <p className="mt-0.5 text-white/90 text-lg">{eventItem.description}</p>
       </div>
     </div>
   );

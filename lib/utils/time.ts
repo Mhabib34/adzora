@@ -20,6 +20,14 @@ export function formatDate(date: Date): string {
 }
 
 /**
+ * Formats a Date to a short Masehi date string.
+ * Example: "30/08/2026"
+ */
+export function formatDateShort(date: Date): string {
+  return format(date, "dd/MM/yyyy");
+}
+
+/**
  * Converts a total number of seconds to a MM:SS string.
  * Example: 330 → "05:30"
  */

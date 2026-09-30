@@ -158,7 +158,7 @@ export class PrayerEngine {
       if (stored) {
         const schedule = deserializeSchedule(stored);
         // Migrasi/Invalidasi otomatis jika cache lama masih mengandung "dhuha"
-        if (schedule.prayers.some((p) => p.key === ("dhuha" as any))) {
+        if (schedule.prayers.some((p) => p.key === ("dhuha" as string))) {
           await clearPrayerSchedules();
           return this.calculateDay(new Date());
         }

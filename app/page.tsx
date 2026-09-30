@@ -16,6 +16,7 @@ export default function RootPage() {
   const isSetupComplete = useMosqueStore((s) => s.config.isSetupComplete);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

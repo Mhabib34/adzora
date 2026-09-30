@@ -184,127 +184,136 @@ export default function MediaPage() {
   const activeCount = images.filter((i) => i.isActive).length;
 
   return (
-    <div className="min-h-screen bg-[--color-background] text-white p-6">
-      <div className="max-w-lg mx-auto space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-[--color-primary]">Media</h1>
-          <p className="text-sm text-white/50 mt-1">
-            Upload foto slideshow dan atur audio adzan.
-          </p>
+    <div className="space-y-8">
+      {/* Top Header */}
+      <div className="border-b border-white/5 pb-6">
+        <h1 className="text-3xl font-bold font-display text-white tracking-wide">
+          Media Galeri & Audio Adzan
+        </h1>
+        <p className="text-sm font-sans text-white/60 mt-1">
+          Kelola koleksi foto slideshow layar display dan nada pengingat adzan
+        </p>
+      </div>
+
+      {/* ── SLIDESHOW IMAGES ── */}
+      <div className="bg-[--color-surface]/60 backdrop-blur-2xl rounded-3xl p-6 border border-[--color-secondary]/20 shadow-xl space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[--color-secondary]/20 border border-[--color-secondary]/30 flex items-center justify-center">
+              <ImageIcon className="w-5 h-5 text-[--color-secondary]" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold font-display text-white">
+                Galeri Foto Slideshow
+              </h2>
+              <p className="text-xs text-white/50">
+                Foto yang akan tampil full-screen secara otomatis di layar TV
+              </p>
+            </div>
+          </div>
+          <span className="text-xs font-semibold font-mono text-[--color-secondary] bg-[--color-secondary]/10 border border-[--color-secondary]/20 px-3 py-1 rounded-full">
+            {activeCount} Aktif / {images.length} Total
+          </span>
         </div>
 
-        {/* ── SLIDESHOW IMAGES ── */}
-        <div className="bg-[--color-surface] rounded-2xl p-5 border border-white/5 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ImageIcon className="w-4 h-4 text-[--color-secondary]" />
-              <h2 className="text-sm font-bold text-white/70 uppercase tracking-wider">
-                Foto Slideshow
-              </h2>
-            </div>
-            <span className="text-xs text-white/30">
-              {activeCount} aktif / {images.length} total
-            </span>
-          </div>
-
-          {/* Upload zone */}
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploadStatus === "uploading"}
-            className="w-full border-2 border-dashed border-white/10 hover:border-[--color-primary]/40 rounded-xl py-8 flex flex-col items-center gap-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {uploadStatus === "uploading" ? (
-              <Loader2 className="w-8 h-8 text-[--color-primary] animate-spin" />
-            ) : uploadStatus === "done" ? (
-              <CheckCircle className="w-8 h-8 text-emerald-400" />
-            ) : (
-              <Upload className="w-8 h-8 text-white/25" />
-            )}
-            <div className="text-center">
-              <p className="text-sm font-semibold text-white/50">
-                {uploadStatus === "uploading"
-                  ? "Mengunggah..."
-                  : uploadStatus === "done"
-                    ? "Berhasil diunggah!"
-                    : "Klik untuk pilih foto"}
-              </p>
-              <p className="text-xs text-white/25 mt-0.5">
-                JPG, PNG, WebP — maks 5 MB per file
-              </p>
-            </div>
-          </button>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={(e) => handleImageUpload(e.target.files)}
-          />
-
-          {uploadStatus === "error" && (
-            <div className="flex items-start gap-2 text-xs text-red-400 bg-red-400/10 rounded-lg px-3 py-2">
-              <AlertCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-              {uploadError}
+        {/* Upload Dropzone */}
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploadStatus === "uploading"}
+          className="w-full border-2 border-dashed border-[--color-secondary]/30 hover:border-[--color-secondary]/60 bg-white/5 hover:bg-white/10 rounded-2xl py-10 flex flex-col items-center justify-center gap-3 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group shadow-inner"
+        >
+          {uploadStatus === "uploading" ? (
+            <Loader2 className="w-10 h-10 text-[--color-secondary] animate-spin" />
+          ) : uploadStatus === "done" ? (
+            <CheckCircle className="w-10 h-10 text-emerald-400" />
+          ) : (
+            <div className="w-14 h-14 rounded-2xl bg-[--color-secondary]/10 border border-[--color-secondary]/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Upload className="w-7 h-7 text-[--color-secondary]" />
             </div>
           )}
-
-          {/* Image list */}
-          {loadingImages ? (
-            <div className="flex items-center justify-center py-6">
-              <Loader2 className="w-5 h-5 text-white/30 animate-spin" />
-            </div>
-          ) : images.length === 0 ? (
-            <p className="text-center text-xs text-white/25 py-4">
-              Belum ada foto yang diunggah.
+          <div className="text-center">
+            <p className="text-sm font-bold font-display text-white">
+              {uploadStatus === "uploading"
+                ? "Mengunggah Gambar..."
+                : uploadStatus === "done"
+                  ? "Berhasil Diunggah!"
+                  : "Klik untuk Memilih Foto Gambar"}
             </p>
-          ) : (
-            <div className="space-y-2">
-              {images.map((img) => (
-                <div
-                  key={img.id}
-                  className={`flex items-center gap-3 rounded-xl p-3 border transition-colors ${
-                    img.isActive
-                      ? "border-white/8 bg-white/3"
-                      : "border-white/3 bg-white/1 opacity-50"
-                  }`}
-                >
-                  {/* Thumbnail */}
-                  <div className="w-12 h-12 rounded-lg bg-white/5 overflow-hidden shrink-0">
-                    {img.blobUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={img.blobUrl}
-                        alt={img.filename}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <ImageIcon className="w-5 h-5 text-white/20" />
-                      </div>
-                    )}
-                  </div>
+            <p className="text-xs font-sans text-white/40 mt-1">
+              Format yang didukung: JPG, PNG, WebP — Maksimal 5 MB per foto
+            </p>
+          </div>
+        </button>
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-white/70 truncate">
-                      {img.filename}
-                    </p>
-                    <p className="text-xs text-white/30 mt-0.5">
-                      {(img.size / 1024).toFixed(0)} KB
-                    </p>
-                  </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={(e) => handleImageUpload(e.target.files)}
+        />
 
-                  {/* Controls */}
-                  <div className="flex items-center gap-1 shrink-0">
+        {uploadStatus === "error" && (
+          <div className="flex items-start gap-2 text-xs text-red-400 bg-red-400/10 border border-red-400/20 rounded-xl p-3">
+            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+            {uploadError}
+          </div>
+        )}
+
+        {/* Image Grid List */}
+        {loadingImages ? (
+          <div className="flex items-center justify-center py-10">
+            <Loader2 className="w-6 h-6 text-[--color-secondary] animate-spin" />
+          </div>
+        ) : images.length === 0 ? (
+          <div className="text-center py-10 text-white/30 border border-white/5 rounded-2xl">
+            <ImageIcon className="w-8 h-8 mx-auto mb-2 opacity-30" />
+            <p className="text-sm">Belum ada foto yang diunggah.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+            {images.map((img) => (
+              <div
+                key={img.id}
+                className={`flex flex-col justify-between rounded-2xl overflow-hidden border transition-all duration-300 shadow-md ${
+                  img.isActive
+                    ? "border-white/10 bg-white/5 hover:border-[--color-secondary]/40"
+                    : "border-white/5 bg-black/20 opacity-40"
+                }`}
+              >
+                {/* Thumbnail */}
+                <div className="h-36 w-full bg-black/40 relative overflow-hidden group">
+                  {img.blobUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={img.blobUrl}
+                      alt={img.filename}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <ImageIcon className="w-8 h-8 text-white/20" />
+                    </div>
+                  )}
+                  <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-mono text-white/80">
+                    {(img.size / 1024).toFixed(0)} KB
+                  </div>
+                </div>
+
+                {/* Footer Controls */}
+                <div className="p-3 flex items-center justify-between gap-2 border-t border-white/5">
+                  <p className="text-xs font-semibold font-sans text-white/80 truncate flex-1">
+                    {img.filename}
+                  </p>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <button
                       onClick={() => handleToggleImage(img.id, img.isActive)}
-                      className={`text-xs rounded-lg px-2 py-1.5 font-semibold transition-colors ${
+                      className={`text-xs rounded-lg px-2 py-1 font-semibold transition-all border ${
                         img.isActive
-                          ? "bg-emerald-500/15 text-emerald-400"
-                          : "bg-white/5 text-white/30"
+                          ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+                          : "bg-white/5 text-white/40 border-white/10"
                       }`}
                     >
                       {img.isActive ? (
@@ -318,13 +327,13 @@ export default function MediaPage() {
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => handleDeleteImage(img.id)}
-                          className="text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg px-2 py-1 font-semibold transition-colors"
+                          className="text-[11px] bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/40 rounded-lg px-2 py-1 font-semibold transition-all"
                         >
-                          Hapus
+                          Ya
                         </button>
                         <button
                           onClick={() => setDeleteConfirmId(null)}
-                          className="text-xs bg-white/5 text-white/40 rounded-lg px-2 py-1 transition-colors"
+                          className="text-[11px] bg-white/5 text-white/40 rounded-lg px-2 py-1 transition-all"
                         >
                           Batal
                         </button>
@@ -332,31 +341,40 @@ export default function MediaPage() {
                     ) : (
                       <button
                         onClick={() => setDeleteConfirmId(img.id)}
-                        className="w-7 h-7 rounded-lg bg-white/5 hover:bg-red-500/15 flex items-center justify-center transition-colors group"
+                        className="w-7 h-7 rounded-lg bg-white/5 hover:bg-red-500/20 flex items-center justify-center border border-white/5 transition-all group"
                       >
-                        <Trash2 className="w-3.5 h-3.5 text-white/40 group-hover:text-red-400" />
+                        <Trash2 className="w-3.5 h-3.5 text-white/50 group-hover:text-red-400" />
                       </button>
                     )}
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── ADZAN AUDIO ── */}
+      <div className="bg-[--color-surface]/60 backdrop-blur-2xl rounded-3xl p-6 border border-[--color-secondary]/20 shadow-xl space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[--color-secondary]/20 border border-[--color-secondary]/30 flex items-center justify-center">
+            <Music className="w-5 h-5 text-[--color-secondary]" />
+          </div>
+          <div>
+            <h2 className="text-base font-bold font-display text-white">
+              Pengaturan Audio Adzan
+            </h2>
+            <p className="text-xs text-white/50">
+              Pilih suara lantunan adzan & tingkat volume suara pengingat
+            </p>
+          </div>
         </div>
 
-        {/* ── ADZAN AUDIO ── */}
-        <div className="bg-[--color-surface] rounded-2xl p-5 border border-white/5 space-y-4">
-          <div className="flex items-center gap-2">
-            <Music className="w-4 h-4 text-[--color-secondary]" />
-            <h2 className="text-sm font-bold text-white/70 uppercase tracking-wider">
-              Audio Adzan
-            </h2>
-          </div>
-
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
           {/* Source selection */}
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-white/50 uppercase tracking-wide">
-              Sumber Audio
+          <div className="space-y-2">
+            <label className="text-xs font-bold tracking-widest uppercase text-white/60">
+              Sumber Audio Adzan
             </label>
             <div className="relative">
               <select
@@ -364,7 +382,7 @@ export default function MediaPage() {
                 onChange={(e) =>
                   setAdzanAudio({ source: e.target.value as AdzanAudioSource })
                 }
-                className="w-full appearance-none rounded-xl px-4 py-3 pr-10 text-sm bg-white/5 border border-white/10 text-white focus:border-[--color-primary]/60 outline-none transition-colors cursor-pointer"
+                className="w-full appearance-none rounded-2xl px-4 py-3.5 pr-10 text-sm bg-white/5 border border-white/10 text-white font-semibold focus:border-[--color-secondary]/60 outline-none transition-all cursor-pointer"
               >
                 {AUDIO_SOURCES.map((src) => (
                   <option key={src} value={src} className="bg-gray-900">
@@ -372,27 +390,27 @@ export default function MediaPage() {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none" />
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
             </div>
           </div>
 
           {/* Volume slider */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-white/50 uppercase tracking-wide">
-                Volume
+              <label className="text-xs font-bold tracking-widest uppercase text-white/60">
+                Tingkat Volume
               </label>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 {volumeSaving && (
-                  <Loader2 className="w-3 h-3 text-white/30 animate-spin" />
+                  <Loader2 className="w-3 h-3 text-[--color-secondary] animate-spin" />
                 )}
-                <span className="text-xs font-mono text-white/50">
+                <span className="text-xs font-mono font-bold text-[--color-secondary] bg-[--color-secondary]/10 border border-[--color-secondary]/20 px-2.5 py-0.5 rounded-full">
                   {Math.round(adzanAudio.volume * 100)}%
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Volume2 className="w-4 h-4 text-white/30 shrink-0" />
+            <div className="flex items-center gap-3 pt-2">
+              <Volume2 className="w-5 h-5 text-[--color-secondary] shrink-0" />
               <input
                 type="range"
                 min={0}
@@ -400,44 +418,42 @@ export default function MediaPage() {
                 step={0.05}
                 value={adzanAudio.volume}
                 onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-                className="flex-1 accent-[--color-primary]"
+                className="flex-1 accent-[--color-secondary] h-2 bg-white/10 rounded-lg cursor-pointer"
               />
             </div>
           </div>
-
-          {/* Fajr adzan toggle */}
-          <div className="flex items-center justify-between py-2 border-t border-white/5">
-            <div>
-              <p className="text-sm font-semibold text-white/80">
-                Adzan Subuh Khusus
-              </p>
-              <p className="text-xs text-white/40 mt-0.5">
-                Gunakan adzan Fajr terpisah untuk waktu Subuh
-              </p>
-            </div>
-            <button
-              onClick={() =>
-                setAdzanAudio({
-                  useFajrAdzanForSubuh: !adzanAudio.useFajrAdzanForSubuh,
-                })
-              }
-              className={`flex items-center gap-1.5 text-xs rounded-xl px-3 py-2 font-semibold transition-colors ${
-                adzanAudio.useFajrAdzanForSubuh
-                  ? "bg-emerald-500/15 text-emerald-400"
-                  : "bg-white/5 text-white/35"
-              }`}
-            >
-              {adzanAudio.useFajrAdzanForSubuh ? (
-                <ToggleRight className="w-5 h-5" />
-              ) : (
-                <ToggleLeft className="w-5 h-5" />
-              )}
-              {adzanAudio.useFajrAdzanForSubuh ? "Aktif" : "Nonaktif"}
-            </button>
-          </div>
         </div>
 
-        <div className="pb-4" />
+        {/* Fajr adzan toggle */}
+        <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10">
+          <div>
+            <p className="text-sm font-bold font-display text-white">
+              Gunakan Adzan Subuh Khusus
+            </p>
+            <p className="text-xs text-white/50 mt-0.5">
+              Mengumandangkan nada khusus &quot;Ash-Shalatu Khairum Minan Naum&quot; saat waktu Subuh tiba
+            </p>
+          </div>
+          <button
+            onClick={() =>
+              setAdzanAudio({
+                useFajrAdzanForSubuh: !adzanAudio.useFajrAdzanForSubuh,
+              })
+            }
+            className={`flex items-center gap-2 text-xs rounded-full px-4 py-2 font-semibold transition-all border ${
+              adzanAudio.useFajrAdzanForSubuh
+                ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
+                : "bg-white/5 text-white/40 border-white/10"
+            }`}
+          >
+            {adzanAudio.useFajrAdzanForSubuh ? (
+              <ToggleRight className="w-5 h-5" />
+            ) : (
+              <ToggleLeft className="w-5 h-5" />
+            )}
+            {adzanAudio.useFajrAdzanForSubuh ? "Aktif" : "Nonaktif"}
+          </button>
+        </div>
       </div>
     </div>
   );

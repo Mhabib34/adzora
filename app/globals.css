@@ -16,9 +16,11 @@
   /* ========================================
      FONT FAMILY
   ======================================== */
-  --font-display: "Inter", sans-serif;
-  --font-arabic: "Scheherazade New", serif;
-  --font-mono: "JetBrains Mono", monospace;
+  --font-sans: var(--font-sans), "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-display: var(--font-display), "Outfit", "Plus Jakarta Sans", sans-serif;
+  --font-arabic: var(--font-arabic), "Amiri", "Scheherazade New", serif;
+  --font-cairo: var(--font-cairo), "Cairo", sans-serif;
+  --font-mono: var(--font-mono), "JetBrains Mono", monospace;
 
   /* ========================================
      FONT SIZE DISPLAY (minimum 2rem)
@@ -150,7 +152,7 @@ html,
 body {
   background-color: var(--color-background);
   color: var(--color-primary-foreground);
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -158,9 +160,26 @@ body {
 /* ========================================
    FONT UTILITIES
 ======================================== */
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
 .font-arabic {
   font-family: var(--font-arabic);
   direction: rtl;
+}
+
+.font-cairo {
+  font-family: var(--font-cairo);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ========================================
